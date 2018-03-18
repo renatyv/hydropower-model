@@ -18,4 +18,5 @@ Pilot_base = Pilot_max;
 % % % % % main servo to pilot servo feedback % % % % % % % % 
 T_mainservo = 0.76;
 T_pilotservo = T_mainservo*1.3;
+% k_feedback < 0.4 --- all steady states become unstable
 k_feedback = 0.5;

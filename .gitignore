@@ -2,3 +2,5 @@
 \.DS_Store
 
 sim_results/
+
+*.m~
