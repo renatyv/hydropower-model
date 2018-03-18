@@ -1,7 +1,7 @@
 function [dg,dPID_i,dpilot_servo] = governerModel(g,PID_i,pilot_servo,omega_m,dOmega_m)
 %REGULATOR_MODEL Summary of this function goes here
 %   Detailed explanation goes here
-global PID_Kp PID_Ki PID_Kd...
+global PID_Kp PID_Ki K_dOmega...
     omega_dead_zone omega_m_nom...
     G_max G_min G_base...
     T_pilotservo T_mainservo...
@@ -18,16 +18,16 @@ else
     if use_dead_zone
         omega_delta = dead_zone(omega_delta,-omega_dead_zone/2,omega_dead_zone/2);
     end
-    PID_in = omega_delta - k_feedback*g;
-    
-    dPID_i = PID_in;
-    PID_d = dOmega_m;
+    dOmega_deadzoned = dOmega_m;
     if use_dead_zone && abs(omega_delta)<omega_dead_zone/2
-        PID_d = 0;
+        dOmega_deadzoned = 0;
     end
-    PID_out = PID_Kp*PID_in...
-        +PID_Ki*PID_i...
-        +PID_Kd*PID_d;
+    PI_in = omega_delta +K_dOmega*dOmega_deadzoned - k_feedback*g;
+    
+    dPID_i = PI_in;
+    
+    PID_out = PID_Kp*PI_in...
+        +PID_Ki*PID_i;
     
     pilot_in = PID_out;
     pilot_max = Pilot_max/Pilot_base;
