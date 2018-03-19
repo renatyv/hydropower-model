@@ -25,14 +25,14 @@ global use_simple_gateflow_model use_constant_turbine_efficiency...
 % number_of_simulations = 500;
 number_of_simulations = 1;
 t_max = 10.0;
-sim_maxstep = 0.0001;
+sim_maxstep = 0.01;
 S_base = 640*10^6; % Base power, Watt, affects simulation stability
 
 %% turbine governer parameters
-PID_Kp=30;
-PID_Ki=1.7;
+PID_Kp=90;
+PID_Ki=30;
 % PID_Kd must be small, otherwise unstable
-K_dOmega=0.3;
+K_dOmega=0.0;
 
 
 %% exciter governer parameters
@@ -59,7 +59,7 @@ use_constant_turbine_efficiency = false;
 turbine_const_efficiency = 0.9;
 simulate_vortex_rope_oscillations = false;
 plot_results = true;
-plot_electric = false;
+plot_electric = true;
 plot_hydraulic = true;
 
 
