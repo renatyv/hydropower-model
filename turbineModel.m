@@ -42,8 +42,8 @@ else
     %% % % Compute H_turb %%%%%
     % turbine speed rpm 
     n=60*omega_m/(2*pi);
-    q_i = 0;
     H_turb = (Q/(gate_flow_coeff*G))^2;
+    q_i = 1000*Q/(d_runner^2*sqrt(H_turb));
     if ~use_simple_gateflow_model
         n_over_q = n*(d_runner^3)/(1000*Q);
         q_i = G_nq_q_f(G,n_over_q);

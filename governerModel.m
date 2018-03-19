@@ -7,7 +7,7 @@ global PID_Kp PID_Ki K_dOmega...
     T_pilotservo T_mainservo...
     Pilot_max Pilot_min Pilot_base...
     constant_governer use_dead_zone...
-    k_feedback use_integrator use_pilot_servo;
+    k_feedback use_integrator;
 
 if constant_governer
     dg = 0;
@@ -34,13 +34,8 @@ else
     pilot_min = Pilot_min/Pilot_base;
     g_max = G_max/G_base;
     g_min = G_min/G_base;
-    if use_pilot_servo
-        [dpilot_servo] = servoModel(pilot_in,pilot_servo,pilot_min,pilot_max,T_pilotservo);
-        [dg] = servoModel(pilot_servo,g,g_min,g_max,T_mainservo);
-    else
-        dpilot_servo = 0;
-        [dg] = servoModel(PID_out,g,g_min,g_max,T_mainservo);
-    end
+    [dpilot_servo] = servoModel(pilot_in,pilot_servo,pilot_min,pilot_max,T_pilotservo);
+    [dg] = servoModel(pilot_servo,g,g_min,g_max,T_mainservo);
 end
 end
 

@@ -9,7 +9,7 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     set(groot,'defaultLineLineWidth',2);
     
     omega_ms = state(:,1);
-    omega_steady = omega_m_nom;
+    omega_steady = steady_state_1(1);
     omega_ers = omega_ms*poles_number;
     omega_pus = omega_ms/omega_m_nom;
     gs = state(:,2);
@@ -58,7 +58,7 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
         turbine_powers(k) = turbine_torque*omega_ms(k);
         H_turbs(k) = H_turb;
     end
-    [ dq,turbine_torque_steady,H_turb_steady] = turbineModel(t(k),g_steady,q_steady,omega_m_nom,z_tailrace0);
+    [ dq,turbine_torque_steady,H_turb_steady] = turbineModel(t(k),g_steady,q_steady,omega_steady,z_tailrace0);
 %     compute Q_i, n_i
 
 %     connected to power network
@@ -76,15 +76,15 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     g_min = min(gs);
     g_max = max(gs);
     plot(gs,omega_ms,...
-        g_steady,omega_m_nom,'go',...
+        g_steady,omega_steady,'go',...
         gs(1),omega_ms(1),'r*')
     hold on;
-    if max(omega_ms)>omega_max1
+%     if max(omega_ms)>omega_max1
         plot([gs(1);gs(end)],[omega_max1,omega_max1],'b--');
-    end
-    if min(omega_ms)<omega_min1
+%     end
+%     if min(omega_ms)<omega_min1
         plot([gs(1);gs(end)],[omega_min1,omega_min1],'b--');
-    end
+%     end
     if max(omega_ms)>omega_max2
         plot([gs(1);gs(end)],[omega_max2,omega_max2],'b--');
     end
@@ -98,7 +98,7 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     fig_1 = figure(1);
     set(fig_1, 'Position', [10, 600, 800, 900])
     subplot(3,2,1);
-    plot(t,omega_ms,[t(1),t(end)],[omega_m_nom,omega_m_nom],'g');
+    plot(t,omega_ms,[t(1),t(end)],[omega_steady,omega_steady],'g');
     hold on;
     if max(omega_ms)>omega_max1
         plot([t(1);t(end)],[omega_max1,omega_max1],'b--');
@@ -137,7 +137,7 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
         Q_is=1000*Qs./(d_runner^2*sqrt(H_turbs));
         Q_i_steady = 1000*Q_steady./(d_runner^2*sqrt(H_turb_steady));
         ns=60*omega_ms/(2*pi);
-        n_steady = 60*omega_m_nom/(2*pi);
+        n_steady = 60*omega_steady/(2*pi);
         n_is=ns*d_runner./sqrt(H_turbs);
         n_i_steady = n_steady*d_runner./sqrt(H_turb_steady);
         hold on;

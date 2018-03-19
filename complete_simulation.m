@@ -23,14 +23,14 @@ global use_simple_gateflow_model use_constant_turbine_efficiency...
 
 %% % % configure simulation
 % number_of_simulations = 500;
-number_of_simulations = 0;
+number_of_simulations = 1;
 t_max = 10.0;
 sim_maxstep = 0.0001;
 S_base = 640*10^6; % Base power, Watt, affects simulation stability
 
 %% turbine governer parameters
-PID_Kp=29.1;
-PID_Ki=9.7;
+PID_Kp=30;
+PID_Ki=1.7;
 % PID_Kd must be small, otherwise unstable
 K_dOmega=0.3;
 
@@ -46,21 +46,20 @@ load_mode = 22;
 constant_turbine_torque = false;
 constant_governer = false;
 use_dead_zone = false;
-use_pilot_servo = true;
 
-constant_generator_torque = true;
+constant_generator_torque = false;
 phi_1 = acos(0.9);
-P_active0 = 300*10^6;
+P_active0 = 250*10^6;
 Q_reactive0 = P_active0/cos(phi_1)*sin(phi_1);
 % N_gen = -300*10^6; %W, generator power
-constant_exciter = true;
+constant_exciter = false;
 
 use_simple_gateflow_model = true;
-use_constant_turbine_efficiency = true;
+use_constant_turbine_efficiency = false;
 turbine_const_efficiency = 0.9;
 simulate_vortex_rope_oscillations = false;
-plot_results = false;
-plot_electric = true;
+plot_results = true;
+plot_electric = false;
 plot_hydraulic = true;
 
 
@@ -87,12 +86,7 @@ omega_m_const = steady_state_1(1);
 z_tailrace_const = z_tailrace0;
 %% check that initial state is steady 
 aut_model =@(s)(full_model(0,s));
-assert(max(aut_model(steady_state_1))<10^-3,'state 1 is not steady');
-assert(max(aut_model(steady_state_2))<10^-3,'state 2 is not steady');
-% domega = 0.0;
-% dg = 0.1;
-% dq = 0.1;
-% initial_state = initial_state+[domega,dg,dq,0,0,0,0,0,0,0,0];
+assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
 disp('steady state');
 printState(steady_state);
 %% compute jacobian 
