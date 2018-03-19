@@ -4,3 +4,7 @@
 sim_results/
 
 *.m~
+
+sim_250MW/
+
+sim_550MW/

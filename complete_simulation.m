@@ -24,7 +24,7 @@ global use_simple_gateflow_model use_constant_turbine_efficiency...
 %% % % configure simulation
 % number_of_simulations = 500;
 number_of_simulations = 1;
-t_max = 10.0;
+t_max = 20.0;
 sim_maxstep = 0.01;
 S_base = 640*10^6; % Base power, Watt, affects simulation stability
 
@@ -49,10 +49,10 @@ use_dead_zone = false;
 
 constant_generator_torque = false;
 phi_1 = acos(0.9);
-P_active0 = 250*10^6;
+P_active0 = 550*10^6;
 Q_reactive0 = P_active0/cos(phi_1)*sin(phi_1);
 % N_gen = -300*10^6; %W, generator power
-constant_exciter = false;
+constant_exciter = true;
 
 use_simple_gateflow_model = true;
 use_constant_turbine_efficiency = false;
@@ -79,10 +79,14 @@ exciterParameters;
 %% initial state
 [steady_state_1,steady_state_2,z_tailrace0,N_turb_steady,exciter_state_1,exciter_state_2] =...
     get_steady_state(H_turb0,P_active0,Q_reactive0);
-steady_state = steady_state_1;
-e_r_const = exciter_state_1;
+steady_state = steady_state_2;
+e_r_const = exciter_state_2;
 N_turb_const = N_turb_steady;
-omega_m_const = steady_state_1(1);
+omega_m_const = steady_state_2(1);
+% steady_state = steady_state_1;
+% e_r_const = exciter_state_1;
+% N_turb_const = N_turb_steady;
+% omega_m_const = steady_state_1(1);
 z_tailrace_const = z_tailrace0;
 %% check that initial state is steady 
 aut_model =@(s)(full_model(0,s));
@@ -106,7 +110,7 @@ disp([eig(Jac1),eig(Jac2)]);
 % state = [initial_state];
 time = [0, t_max];
 for k=1:number_of_simulations
-%     initial_state = get_state_near(steady_state);
+%     initial_state = generate_state_near(steady_state);
 %     initial_state = [15.1945,0.9306,0.8487,0.2901,0.2509,1.0052,0.5948,...
 % 0.6946,0.9076,0.2504,0.9701];
     initial_state = steady_state;

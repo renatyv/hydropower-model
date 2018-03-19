@@ -12,10 +12,10 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     omega_steady = steady_state_1(1);
     omega_ers = omega_ms*poles_number;
     omega_pus = omega_ms/omega_m_nom;
-    gs = state(:,2);
-    g_steady = steady_state_1(2);
-    qs = state(:,3);
-    q_steady = steady_state_1(3);
+    qs = state(:,2);
+    q_steady = steady_state_1(2);
+    gs = state(:,3);
+    g_steady = steady_state_1(3);
     Gs = gs*G_base;
     Qs = qs*Q_base;
     G_steady = g_steady*G_base;
@@ -80,16 +80,16 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
         gs(1),omega_ms(1),'r*')
     hold on;
 %     if max(omega_ms)>omega_max1
-        plot([gs(1);gs(end)],[omega_max1,omega_max1],'b--');
+        plot([g_min;g_max],[omega_max1,omega_max1],'b--');
 %     end
 %     if min(omega_ms)<omega_min1
-        plot([gs(1);gs(end)],[omega_min1,omega_min1],'b--');
+        plot([g_min;g_max],[omega_min1,omega_min1],'b--');
 %     end
     if max(omega_ms)>omega_max2
-        plot([gs(1);gs(end)],[omega_max2,omega_max2],'b--');
+        plot([g_min;g_max],[omega_max2,omega_max2],'b--');
     end
     if min(omega_ms)<omega_min2
-        plot([gs(1);gs(end)],[omega_min2,omega_min2],'b--');
+        plot([g_min;g_max],[omega_min2,omega_min2],'b--');
     end
     hold off;
     xlabel('g');

@@ -2,7 +2,7 @@ function [value,isterminal,direction] = stop_integration_event( t,state )
 %STOP_INTEGRATION_EVENT Summary of this function goes here
 %   Detailed explanation goes here
 global G_max pilot_max Q_max gate_flow_coeff H_max...
-        G_base Q_base;
+        G_base Q_base omega_m_nom;
 omega_m = state(1);
 G=state(2)*G_base;
 Q=state(3)*Q_base;
@@ -20,7 +20,8 @@ pilot_servo = state(5);
 
 % check that all of them are non-negative
 H_turb = (Q/(gate_flow_coeff*G))^2;
-value=min([G,(G_max-G),Q,(Q_max-Q),H_turb,(300-H_turb),omega_m,(20-omega_m)]);% value(i) is the value of the ith event function.
+% value=min([G,(G_max-G),Q,(Q_max-Q),H_turb,(H_max-H_turb),omega_m,(omega_m_nom-omega_m)]);% value(i) is the value of the ith event function.
+value=min([G,(2*G_max-G),Q,(2*Q_max-Q),H_turb,(2*H_max-H_turb),omega_m,(2*omega_m_nom-omega_m)]);% value(i) is the value of the ith event function.
 
 if value<0 
 %     print_state(state);
