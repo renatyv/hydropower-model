@@ -3,7 +3,7 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2, plot
 %   Detailed explanation goes here
 global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     omega_er_base S_base torque_base...
-    r_s T_r z_tailrace0 eta_Q_u eta_n_u eta_eta_u;
+    r_s T_r z_tailrace_const eta_Q_u eta_n_u eta_eta_u;
 
 % 
     set(groot,'defaultLineLineWidth',2);
@@ -51,14 +51,14 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     e_rs=(dPsi_rs*T_r+e_qs);
     
 %     compute turbine power
-    turbine_powers = zeros(size(Qs));
+    Turbine_powers = zeros(size(Qs));
     H_turbs = zeros(size(Qs));
-    for k=1:length(turbine_powers)
-        [ dq,turbine_torque,H_turb] = turbineModel(t(k),gs(k),qs(k),omega_ms(k),z_tailrace0);
-        turbine_powers(k) = turbine_torque*omega_ms(k);
+    for k=1:length(Turbine_powers)
+        [ dq,Turbine_power,H_turb] = turbineModel(t(k),gs(k),qs(k),omega_ms(k),z_tailrace_const);
+        Turbine_powers(k) = Turbine_power;
         H_turbs(k) = H_turb;
     end
-    [ dq,turbine_torque_steady,H_turb_steady] = turbineModel(t(k),g_steady,q_steady,omega_steady,z_tailrace0);
+    [ dq,Turbine_power_steady,H_turb_steady] = turbineModel(t(k),g_steady,q_steady,omega_steady,z_tailrace_const);
 %     compute Q_i, n_i
 
 %     connected to power network
@@ -120,10 +120,9 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     subplot(3,2,2);
     active_powers = (v_ds.*i_ds+v_qs.*i_qs)*S_base/10^6;
     reactive_powers = (v_qs.*i_ds-v_ds.*i_qs)*S_base/10^6;
-    turbine_powers_pu = turbine_powers/10^6;
     generator_torques = (psi_ds.*i_qs-psi_qs.*i_ds)*torque_base;
     generator_powers_pu = omega_ms.*generator_torques/10^6;
-    plot(t,active_powers,t,reactive_powers,t,turbine_powers_pu,t,generator_powers_pu);
+    plot(t,active_powers,t,reactive_powers,t,Turbine_powers,t,generator_powers_pu);
     legend('active load','reactive load','turbine','generator');
     xlabel('t');
     ylabel('power, MW');

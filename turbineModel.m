@@ -1,4 +1,4 @@
-function [ dq,Turbine_torque,H_turb] = turbineModel(t,g,q,omega_m,z_tailrace)
+function [ dq,Turbine_power,H_turb] = turbineModel(t,g,q,omega_m,z_tailrace)
 %HYDRAULIC_MODEL Summary of this function goes here
 %   Detailed explanation goes here
 global use_simple_gateflow_model use_constant_turbine_efficiency constant_turbine_torque...
@@ -12,12 +12,12 @@ global use_simple_gateflow_model use_constant_turbine_efficiency constant_turbin
     Q_base H_base S_base torque_base G_base...
     osc_Gs osc_ampl...
     simulate_vortex_rope_oscillations...
-    omega_m_nom N_turb_const omega_m_const;
+    omega_m_nom N_turb_const;
 
 
 if constant_turbine_torque
     dq = 0;
-    Turbine_torque = N_turb_const/omega_m_const;
+    Turbine_power = N_turb_const;
     H_turb = z_forebay-z_tailrace;
 else 
     Q=q*Q_base;
@@ -58,6 +58,6 @@ else
     if ~use_constant_turbine_efficiency
         turbine_efficiency = turbine_eta_m(q_i,n_i);
     end
-    Turbine_torque = rho*a_g*Q*H_turb*turbine_efficiency/omega_m;
+    Turbine_power = rho*a_g*Q*H_turb*turbine_efficiency;
 end
 end

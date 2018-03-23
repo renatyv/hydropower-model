@@ -29,8 +29,8 @@ sim_maxstep = 0.01;
 S_base = 640*10^6; % Base power, Watt, affects simulation stability
 
 %% turbine governer parameters
-PID_Kp=90;
-PID_Ki=30;
+PID_Kp=150;
+PID_Ki=10;
 % PID_Kd must be small, otherwise unstable
 K_dOmega=0.0;
 
@@ -52,10 +52,10 @@ phi_1 = acos(0.9);
 P_active0 = 550*10^6;
 Q_reactive0 = P_active0/cos(phi_1)*sin(phi_1);
 % N_gen = -300*10^6; %W, generator power
-constant_exciter = true;
+constant_exciter = false;
 
 use_simple_gateflow_model = true;
-use_constant_turbine_efficiency = false;
+use_constant_turbine_efficiency = true;
 turbine_const_efficiency = 0.9;
 simulate_vortex_rope_oscillations = false;
 plot_results = true;
@@ -66,7 +66,7 @@ plot_hydraulic = true;
 %% initialize parameters
 rpm_nom = 142.8; % revolutions per minute nomial frequency
 omega_m_nom = rpm_nom/60*2*pi; %(rad/s), mechanical frequency of the rotor
-H_turb0 = 200; % initial turbine generated head
+z_tailrace_const = 200; % initial tailrace
 
 generatorParametersDAN;
 turbineParameters;
@@ -77,17 +77,14 @@ exciterParameters;
 % % % initial frequency in radian/s, electrical radian/s, HZ and rpm
 
 %% initial state
-[steady_state_1,steady_state_2,z_tailrace0,N_turb_steady,exciter_state_1,exciter_state_2] =...
-    get_steady_state(H_turb0,P_active0,Q_reactive0);
+[steady_state_1,steady_state_2,N_turb_steady,exciter_state_1,exciter_state_2] =...
+    get_steady_state(z_tailrace_const,P_active0,Q_reactive0);
 steady_state = steady_state_2;
 e_r_const = exciter_state_2;
-N_turb_const = N_turb_steady;
-omega_m_const = steady_state_2(1);
 % steady_state = steady_state_1;
 % e_r_const = exciter_state_1;
-% N_turb_const = N_turb_steady;
-% omega_m_const = steady_state_1(1);
-z_tailrace_const = z_tailrace0;
+N_turb_const = N_turb_steady;
+omega_m_const = steady_state(1);
 %% check that initial state is steady 
 aut_model =@(s)(full_model(0,s));
 assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
@@ -110,10 +107,10 @@ disp([eig(Jac1),eig(Jac2)]);
 % state = [initial_state];
 time = [0, t_max];
 for k=1:number_of_simulations
-%     initial_state = generate_state_near(steady_state);
-%     initial_state = [15.1945,0.9306,0.8487,0.2901,0.2509,1.0052,0.5948,...
-% 0.6946,0.9076,0.2504,0.9701];
-    initial_state = steady_state;
+    initial_state = generate_state_near(steady_state);
+%     initial_state = [14.6056    0.6823    0.6066    0.2230    0.6223...
+%     0.4205    0.9621    0.6896    0.6846    0.5113    1.1084];
+%     initial_state = steady_state;
     printState(initial_state);
     options = odeset('MaxStep',sim_maxstep,'Events',@stop_integration_event);
 %     options = odeset('MaxStep',sim_maxstep);
@@ -150,8 +147,8 @@ global complete_inertia poles_number z_tailrace_const;
     exciter_state = state(11);
     omega_er = omega_m*poles_number; % electrical radians
     
-    [ dq,Turbine_torque,H_turb]=...
-        turbineModel(t,g,q,omega_m,z_tailrace_const);
+    [ dq,Turbine_power,H_turb] = turbineModel(t,g,q,omega_m,z_tailrace_const);
+    Turbine_torque = Turbine_power/omega_m;
 
     [e_q,e_rq,e_rd,i_q,i_d] = psi_to_E(psi_d,psi_q,psi_r,psi_rd,psi_rq);
     [v_d,v_q] = loadModel(t,i_d,i_q,omega_m);
