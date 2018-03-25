@@ -1,4 +1,4 @@
-function [steady_state_1,steady_state_2,N_turb,exciter_state_1,exciter_state_2] =...
+function [steady_state_1,steady_state_2,N_turb,e_r_1,e_r_2] =...
     get_steady_state(z_tailrace,P_active0,Q_reactive0)
 %UNTITLED5 Summary of this function goes here
 %   Detailed explanation goes here
@@ -35,25 +35,17 @@ hydro_state_1 = [q1, g1, PID_i1,pilot_servo1];
 % omega_m0 = omega_m_nom;
 % omega_er0 = omega_m_nom*poles_number;
 
-[gen_state_1,gen_state_2] =...
+[psi_1,e_r_1,psi_2,e_r_2] =...
     generatorSteadyStateDan(i_ampl, phi_1,omega_er0);
 
-% state = [psi_d,psi_q,psi_r,psi_rd,psi_rq,E_r,theta,t_shaft,phi_1]
-theta_er1 = gen_state_1(6);
-theta_er2 = gen_state_2(6);
-% field voltage
-exciter_state_1  = gen_state_1(7);
-t_shaft1 = gen_state_1(8);
+% For PI
+exciter_state_1  = e_r_1;
+exciter_state_2  = e_r_2;
+% exciter_state_1  = exciter_ac4aSteadyState(e_r_1);
+% exciter_state_2  = exciter_ac4aSteadyState(e_r_2);
 
-exciter_state_2 = gen_state_2(7);
-t_shaft2 = gen_state_2(8);
-
-% the same for both steady states
-phi_1 = gen_state_1(9);
-
-
-steady_state_1 = [omega_m0,hydro_state_1,gen_state_1(1:5),exciter_state_1];
-steady_state_2 = [omega_m0,hydro_state_1,gen_state_2(1:5),exciter_state_2];
+steady_state_1 = [omega_m0,hydro_state_1,psi_1,exciter_state_1];
+steady_state_2 = [omega_m0,hydro_state_1,psi_2,exciter_state_2];
 
 % isStateSteady(initial_state_1,P_active0,Q_reactive0,z_tailrace,e_r1);
 % isStateSteady(initial_state_2,P_active0,Q_reactive0,z_tailrace,e_r2);

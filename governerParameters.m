@@ -19,4 +19,4 @@ Pilot_base = Pilot_max;
 T_mainservo = 0.76;
 T_pilotservo = T_mainservo*1.3;
 % k_feedback < 0.4 --- all steady states become unstable
-k_feedback = 0.5;
+% k_feedback = 0.5;

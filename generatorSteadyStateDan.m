@@ -1,4 +1,4 @@
-function [state_1, state_2] =...
+function [psi_1,e_r_1, psi_2,e_r_2] =...
     generatorSteadyStateDan(i0, phi_1,omega_er0)
 %% simulateModel sets paremeters
 % for system and starts modelling
@@ -16,7 +16,7 @@ global  x_0 x_D x_Q x_f x_ad x_q x_d x_aq omega_er_base...
 %     options = optimset('Display','iter'); % show iterations
     theta_er1 = fzero(theta_f,[-pi,0]);
     theta_er2 = fzero(theta_f,[0,pi]);
-    function state = compute_state(theta)
+    function [psi,e_r] = compute_state(theta)
         v_d = v_df(theta);
         v_q = v_qf(theta);
         i_d = i_df(theta);
@@ -30,7 +30,7 @@ global  x_0 x_D x_Q x_f x_ad x_q x_d x_aq omega_er_base...
         e_r = e_q;
         psi_r = (x_ad^2)/x_r*i_d+e_q;
         psi_rd = (x_ad^2)/x_rd*i_d+x_ad/x_rd*e_q;
-        t_shaft = -(psi_d*i_q-psi_q*i_d);
+%         t_shaft = -(psi_d*i_q-psi_q*i_d);
         [e_q1,e_rq1,e_rd1,i_q1,i_d1] = psi_to_E(psi_d,psi_q,psi_r,psi_rd,psi_rq);
         test_eps = 10^-6;
         assert(abs(e_q1-e_q)<test_eps,'wrong E_q');
@@ -38,12 +38,8 @@ global  x_0 x_D x_Q x_f x_ad x_q x_d x_aq omega_er_base...
         assert(abs(e_rd1-e_rd)<test_eps,'wrong E_rd');
         assert(abs(i_q1-i_q)<test_eps,'wrong i_q');
         assert(abs(i_d1-i_d)<test_eps,'wrong i_d');
-        state = [psi_d,psi_q,psi_r,psi_rd,psi_rq,theta,e_r,t_shaft,phi_1];
+        psi = [psi_d,psi_q,psi_r,psi_rd,psi_rq];
     end
-    state_1 = compute_state(theta_er1);
-    state_2 = compute_state(theta_er2);
-    assert((state_1-state_2)*(state_1-state_2)'>0,'same steady states');
-    torque_1 = state_1(end-1);
-    torque_2 = state_2(end-1);
-    assert(abs(torque_1-torque_2)<0.001,'inconsistant steady state torques');
+    [psi_1,e_r_1] = compute_state(theta_er1);
+    [psi_2,e_r_2] = compute_state(theta_er2);
 end

@@ -1,5 +1,4 @@
 global v_emin v_emax v_rmin v_rmax T_A T_B T_C K_A v_fref K_C;
-% from simulink model
 K_A = 200;
 T_A = 0.015;
 v_emin = -10;

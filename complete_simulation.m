@@ -18,7 +18,7 @@ global use_simple_gateflow_model use_constant_turbine_efficiency...
     exciter_PID_Ki exciter_PID_Kp...
     T_r r_s use_dead_zone Power_max...
     use_integrator...
-    N_turb_const omega_m_const T_m;
+    N_turb_const omega_m_const T_m k_feedback;
 
 
 %% % % configure simulation
@@ -29,15 +29,16 @@ sim_maxstep = 0.01;
 S_base = 640*10^6; % Base power, Watt, affects simulation stability
 
 %% turbine governer parameters
-PID_Kp=150;
-PID_Ki=10;
+PID_Kp=30;
+PID_Ki=2;
+k_feedback = 0.7;
 % PID_Kd must be small, otherwise unstable
 K_dOmega=0.0;
 
 
 %% exciter governer parameters
-exciter_PID_Ki=10;
-exciter_PID_Kp=50;
+exciter_PID_Ki=2;
+exciter_PID_Kp=10;
 
 %% 0 -- constant MVA, 22 (a=b=2)-- constant impedance, 12 (a=1,b=2)
 load_mode = 22;
@@ -49,7 +50,7 @@ use_dead_zone = false;
 
 constant_generator_torque = false;
 phi_1 = acos(0.9);
-P_active0 = 550*10^6;
+P_active0 = 500*10^6;
 Q_reactive0 = P_active0/cos(phi_1)*sin(phi_1);
 % N_gen = -300*10^6; %W, generator power
 constant_exciter = false;
@@ -107,9 +108,8 @@ disp([eig(Jac1),eig(Jac2)]);
 % state = [initial_state];
 time = [0, t_max];
 for k=1:number_of_simulations
-    initial_state = generate_state_near(steady_state);
-%     initial_state = [14.6056    0.6823    0.6066    0.2230    0.6223...
-%     0.4205    0.9621    0.6896    0.6846    0.5113    1.1084];
+%     initial_state = generate_state_near(steady_state);
+    initial_state = [14.7524    0.1055    0.1220    0.1806    0.1940   -0.9569   -0.1584   -0.9454   -1.2136   -0.1122   -0.6520];
 %     initial_state = steady_state;
     printState(initial_state);
     options = odeset('MaxStep',sim_maxstep,'Events',@stop_integration_event);
@@ -147,10 +147,10 @@ global complete_inertia poles_number z_tailrace_const;
     exciter_state = state(11);
     omega_er = omega_m*poles_number; % electrical radians
     
-    [ dq,Turbine_power,H_turb] = turbineModel(t,g,q,omega_m,z_tailrace_const);
+    [ dq,Turbine_power,~] = turbineModel(t,g,q,omega_m,z_tailrace_const);
     Turbine_torque = Turbine_power/omega_m;
 
-    [e_q,e_rq,e_rd,i_q,i_d] = psi_to_E(psi_d,psi_q,psi_r,psi_rd,psi_rq);
+    [~,~,~,i_q,i_d] = psi_to_E(psi_d,psi_q,psi_r,psi_rd,psi_rq);
     [v_d,v_q] = loadModel(t,i_d,i_q,omega_m);
     [e_r,dexciter_state] = exciterModelPI(v_q,v_d,exciter_state);
     [ dpsi_d, dpsi_q, dpsi_r,dpsi_rd,dpsi_rq,Electric_torque] =...

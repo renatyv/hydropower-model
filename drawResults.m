@@ -10,36 +10,36 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     
     omega_ms = state(:,1);
     omega_steady = steady_state_1(1);
-    omega_ers = omega_ms*poles_number;
+%     omega_ers = omega_ms*poles_number;
     omega_pus = omega_ms/omega_m_nom;
     qs = state(:,2);
     q_steady = steady_state_1(2);
     gs = state(:,3);
     g_steady = steady_state_1(3);
-    Gs = gs*G_base;
+%     Gs = gs*G_base;
     Qs = qs*Q_base;
-    G_steady = g_steady*G_base;
+%     G_steady = g_steady*G_base;
     Q_steady = q_steady*Q_base;
-    PID_is = state(:,4);
-    PID_i_steady = steady_state_1(4);
+%     PID_is = state(:,4);
+%     PID_i_steady = steady_state_1(4);
     pilot_servos = state(:,5);
     pilot_servo_steady = steady_state_1(5);
     psi_ds = state(:,6);
-    psi_d_steady_1 = steady_state_1(6);
-    psi_d_steady_2 = steady_state_2(6);
+%     psi_d_steady_1 = steady_state_1(6);
+%     psi_d_steady_2 = steady_state_2(6);
     psi_qs = state(:,7);
-    psi_q_steady_1 = steady_state_1(7);
-    psi_q_steady_2 = steady_state_2(7);
+%     psi_q_steady_1 = steady_state_1(7);
+%     psi_q_steady_2 = steady_state_2(7);
     psi_rs = state(:,8);
-    psi_r_steady_1 = steady_state_1(8);
-    psi_r_steady_2 = steady_state_2(8);
+%     psi_r_steady_1 = steady_state_1(8);
+%     psi_r_steady_2 = steady_state_2(8);
     psi_rds = state(:,9);
-    psi_rd_steady_1 = steady_state_1(9);
-    psi_rd_steady_2 = steady_state_2(9);
+%     psi_rd_steady_1 = steady_state_1(9);
+%     psi_rd_steady_2 = steady_state_2(9);
     psi_rqs = state(:,10);
-    psi_rq_steady_1 = steady_state_1(10);
-    psi_rq_steady_2 = steady_state_2(10);
-    exciter_states = state(:,11);
+%     psi_rq_steady_1 = steady_state_1(10);
+%     psi_rq_steady_2 = steady_state_2(10);
+% %     exciter_states = state(:,11);
     
 %    compute exciter voltage
     [e_qs,e_rqs,e_rds,i_qs,i_ds] = psi_to_E(psi_ds,psi_qs,psi_rs,psi_rds,psi_rqs);
@@ -162,39 +162,18 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
         legend([p1],'g','pilot','q','h_{turb}','Location','northeastoutside');
         hold off;
         
-%         figure(5);
-%         subplot(3,2,6);
-%         plot(t,H_turbs,t,Qs);
-%         xlabel('t, s');
-%         legend('Turbine head, m', 'discharge, m^3/s');
     end
        
     if plot_electric
-%         figure(7);
-%         plot(t,sqrt(v_qs.^2+v_ds.^2));
-%         legend('sqrt(v_d^2+v_q^2)');
-%         xlabel('t');
         subplot(3,2,5);
-%         figure(8);
         plot(t,i_ds,'r',t,i_qs,'g',t,v_ds,'b',t,v_qs,'k');
         legend('i_d', 'i_q','v_d','v_q','Location','northeastoutside');
         xlabel('t');
         
         subplot(3,2,6);
-%         figure(8);
-        plot(t,sqrt(v_qs.^2+v_ds.^2));
-        ylabel('sqrt(v_d^2+v_q^2)');
+        plot(t,sqrt(v_qs.^2+v_ds.^2),t,e_rs);
+        legend('sqrt(v_d^2+v_q^2)','e_r');
         xlabel('t');
-
-%         figure(9);
-%         plot(t,e_qs,t,e_rs);
-%         legend('e_q','e_r');
-%         xlabel('t');
-        
-%         figure(10);
-%         plot(t,psi_ds,t,psi_qs,t,psi_rs,t,psi_rds,t,psi_rqs);
-%         legend('\psi_d','\psi_q','\psi_r','\psi_{rd}','\psi_{rq}');
-%         xlabel('t');
     end
 end
 
