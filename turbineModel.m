@@ -1,4 +1,4 @@
-function [ dq,Turbine_power,H_turb] = turbineModel(t,g,q,omega_m,z_tailrace)
+function [ dq,Turbine_power,H_turb,H_loss] = turbineModel(t,g,q,omega_m)
 %HYDRAULIC_MODEL Summary of this function goes here
 %   Detailed explanation goes here
 global use_simple_gateflow_model use_constant_turbine_efficiency constant_turbine_torque...
@@ -12,13 +12,13 @@ global use_simple_gateflow_model use_constant_turbine_efficiency constant_turbin
     Q_base H_base S_base torque_base G_base...
     osc_Gs osc_ampl...
     simulate_vortex_rope_oscillations...
-    omega_m_nom N_turb_const;
+    N_turb_const z_tailrace_const;
 
 
 if constant_turbine_torque
     dq = 0;
     Turbine_power = N_turb_const;
-    H_turb = z_forebay-z_tailrace;
+    H_turb = z_forebay-z_tailrace_const;
 else 
     Q=q*Q_base;
     G=g*G_base;
@@ -34,11 +34,6 @@ else
         H_osc = sin(omega_osc*t)*spline(osc_Gs,osc_ampl,G);
     end
 
-    %% compute loss and static head
-    % fprintf('z_tailrace=%.f\n',z_tailrace);
-    H_st = z_forebay-z_tailrace+H_osc;
-    H_loss = f_p*L_penstock*8*Q^2/((pi^2)*(d_penstock^5)*a_g);
-
     %% % % Compute H_turb %%%%%
     % turbine speed rpm 
     n=60*omega_m/(2*pi);
@@ -49,6 +44,12 @@ else
         q_i = G_nq_q_f(G,n_over_q);
         H_turb = (1000*Q/((d_runner^2)*q_i))^2;
     end
+    
+    %% compute loss and static head
+    % fprintf('z_tailrace=%.f\n',z_tailrace);
+    H_st = z_forebay-z_tailrace_const+H_osc;
+    H_loss = f_p*L_penstock*8*Q^2/((pi^2)*(d_penstock^5)*a_g);
+    
     dQ = (A_penstock*a_g/L_penstock)*(H_st-H_loss-H_turb);
     dq = dQ/Q_base;
 

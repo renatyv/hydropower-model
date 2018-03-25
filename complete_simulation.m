@@ -11,7 +11,8 @@ global use_simple_gateflow_model use_constant_turbine_efficiency...
     complete_inertia runner_inertia rotor_inertia...
     constant_turbine_torque constant_generator_torque...
     omega_er_base...
-    z_tailrace_const e_r_const constant_exciter constant_governer...
+    z_tailrace_const z_forebay...
+    e_r_const constant_exciter constant_governer...
     P_active0 Q_reactive0...
     load_mode...
     Q_base G_base S_base torque_base...
@@ -50,14 +51,14 @@ use_dead_zone = false;
 
 constant_generator_torque = false;
 phi_1 = acos(0.9);
-P_active0 = 500*10^6;
+P_active0 = 100*10^6;
 Q_reactive0 = P_active0/cos(phi_1)*sin(phi_1);
 % N_gen = -300*10^6; %W, generator power
 constant_exciter = false;
 
 use_simple_gateflow_model = true;
 use_constant_turbine_efficiency = true;
-turbine_const_efficiency = 0.9;
+turbine_const_efficiency = 0.8;
 simulate_vortex_rope_oscillations = false;
 plot_results = true;
 plot_electric = true;
@@ -67,8 +68,20 @@ plot_hydraulic = true;
 %% initialize parameters
 rpm_nom = 142.8; % revolutions per minute nomial frequency
 omega_m_nom = rpm_nom/60*2*pi; %(rad/s), mechanical frequency of the rotor
-z_tailrace_const = 200; % initial tailrace
+%% % % Forebay and tailrace parameters
+% forebay parameters
+z_fnorm = 539; % (m) forebay operating level
+z_fmax = 540; % (m)forebay max level
+z_fmin = 500; % (m)forebay min level
+z_forebay = z_fnorm;
+z_t1 = 319; % (m)maynskaya GES forebay 1
+z_t2 = 327; % (m) maynskaya GES forebay 2
+z_t3 = 331; % (m)maynskaya GES forebay 3
+z_mayn = 324; % (m) maynskaya GES forebay operating level
+z_turbine = 314; % (m) turbine height
+z_tailrace_const = z_t3; % tailrace
 
+%% models parameters
 generatorParametersDAN;
 turbineParameters;
 complete_inertia=runner_inertia+rotor_inertia;
@@ -79,7 +92,7 @@ exciterParameters;
 
 %% initial state
 [steady_state_1,steady_state_2,N_turb_steady,exciter_state_1,exciter_state_2] =...
-    get_steady_state(z_tailrace_const,P_active0,Q_reactive0);
+    get_steady_state(P_active0,Q_reactive0);
 steady_state = steady_state_2;
 e_r_const = exciter_state_2;
 % steady_state = steady_state_1;
@@ -88,9 +101,9 @@ N_turb_const = N_turb_steady;
 omega_m_const = steady_state(1);
 %% check that initial state is steady 
 aut_model =@(s)(full_model(0,s));
-assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
 disp('steady state');
 printState(steady_state);
+assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
 %% compute jacobian 
 
 if use_dead_zone
@@ -133,7 +146,7 @@ end
 
 %% complete model 
 function [dstate] = full_model(t,state)
-global complete_inertia poles_number z_tailrace_const;
+global complete_inertia poles_number;
     omega_m = state(1);
     q = state(2);
     g = state(3);
@@ -147,7 +160,7 @@ global complete_inertia poles_number z_tailrace_const;
     exciter_state = state(11);
     omega_er = omega_m*poles_number; % electrical radians
     
-    [ dq,Turbine_power,~] = turbineModel(t,g,q,omega_m,z_tailrace_const);
+    [ dq,Turbine_power,~,~] = turbineModel(t,g,q,omega_m);
     Turbine_torque = Turbine_power/omega_m;
 
     [~,~,~,i_q,i_d] = psi_to_E(psi_d,psi_q,psi_r,psi_rd,psi_rq);

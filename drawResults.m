@@ -54,11 +54,11 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     Turbine_powers = zeros(size(Qs));
     H_turbs = zeros(size(Qs));
     for k=1:length(Turbine_powers)
-        [ dq,Turbine_power,H_turb] = turbineModel(t(k),gs(k),qs(k),omega_ms(k),z_tailrace_const);
+        [ dq,Turbine_power,H_turb,H_loss] = turbineModel(t(k),gs(k),qs(k),omega_ms(k));
         Turbine_powers(k) = Turbine_power;
         H_turbs(k) = H_turb;
     end
-    [ dq,Turbine_power_steady,H_turb_steady] = turbineModel(t(k),g_steady,q_steady,omega_steady,z_tailrace_const);
+    [ dq,Turbine_power_steady,H_turb_steady] = turbineModel(t(k),g_steady,q_steady,omega_steady);
 %     compute Q_i, n_i
 
 %     connected to power network
@@ -86,10 +86,10 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
         plot([g_min;g_max],[omega_min1,omega_min1],'b--');
 %     end
     if max(omega_ms)>omega_max2
-        plot([g_min;g_max],[omega_max2,omega_max2],'b--');
+        plot([g_min;g_max],[omega_max2,omega_max2],'r--');
     end
     if min(omega_ms)<omega_min2
-        plot([g_min;g_max],[omega_min2,omega_min2],'b--');
+        plot([g_min;g_max],[omega_min2,omega_min2],'r--');
     end
     hold off;
     xlabel('g');
@@ -100,17 +100,17 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     subplot(3,2,1);
     plot(t,omega_ms,[t(1),t(end)],[omega_steady,omega_steady],'g');
     hold on;
-    if max(omega_ms)>omega_max1
+%     if max(omega_ms)>omega_max1
         plot([t(1);t(end)],[omega_max1,omega_max1],'b--');
-    end
-    if min(omega_ms)<omega_min1
+%     end
+%     if min(omega_ms)<omega_min1
         plot([t(1);t(end)],[omega_min1,omega_min1],'b--');
-    end
+%     end
     if max(omega_ms)>omega_max2
-        plot([t(1);t(end)],[omega_max2,omega_max2],'b--');
+        plot([t(1);t(end)],[omega_max2,omega_max2],'r--');
     end
     if min(omega_ms)<omega_min2
-        plot([t(1);t(end)],[omega_min2,omega_min2],'b--');
+        plot([t(1);t(end)],[omega_min2,omega_min2],'r--');
     end
     hold off;
     xlabel('t');

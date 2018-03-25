@@ -17,18 +17,6 @@ global z_forebay z_turbine z_t1 z_t2 z_t3...
 a_g = 9.8; % m/s^2 gravitational acceleration
 rho = 1000; % kg/m^3 --- water density
 
-%% % % Forebay and tailrace parameters
-% forebay parameters
-z_fnorm = 539; % (m) forebay operating level
-z_fmax = 540; % (m)forebay max level
-z_fmin = 500; % (m)forebay min level
-z_forebay = z_fnorm;
-z_t1 = 319; % (m)maynskaya GES forebay 1
-z_t2 = 327; % (m) maynskaya GES forebay 2
-z_t3 = 331; % (m)maynskaya GES forebay 3
-z_mayn = 324; % (m) maynskaya GES forebay operating level
-z_turbine = 314; % (m) turbine height
-
 %% % % Runner parameters
 d_runner = 6.77; % (m) runner diameter, 
 r_runner = d_runner/2; % (m) runner radius

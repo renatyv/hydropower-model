@@ -1,9 +1,11 @@
 %% % % % % % % % % % % % % % % controller(regulator) % % % % % % % % % % % % % % % % % % % 
 global Pilot_base...
     Pilot_max Pilot_min  omega_dead_zone...
-    k_feedback T_m T_w T_mainservo T_pilotservo;
+    k_feedback T_m T_w T_mainservo T_pilotservo...
+    omega_gov_ref omega_m_nom;
 % % % % dead zone % % % % % % % % % %
 omega_dead_zone = 5*omega_m_nom*10^-5;
+omega_gov_ref = omega_m_nom+0.35;
 
 % % % %  PID controller % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 Kp = 0.8*T_m/T_w; % 1.68

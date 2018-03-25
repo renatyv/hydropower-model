@@ -1,9 +1,10 @@
 function [steady_state_1,steady_state_2,N_turb,e_r_1,e_r_2] =...
-    get_steady_state(z_tailrace,P_active0,Q_reactive0)
+    get_steady_state(P_active0,Q_reactive0)
 %UNTITLED5 Summary of this function goes here
 %   Detailed explanation goes here
 global omega_m_nom poles_number torque_base S_base G_base Q_base r_s...
-    k_feedback constant_governer PID_Ki;
+    k_feedback constant_governer PID_Ki...
+    omega_gov_ref z_tailrace_const;
 % generatorParametersDAN;
 % turbineGovernerParameters;
 % exciterParameters;
@@ -17,11 +18,11 @@ N_gen = -((i_ampl^2)*r_s*S_base+P_active0);
 N_turb = -N_gen;
 
 %% turbine and vogerner steady state
-omega_of_g = @(g)(omega_m_nom - k_feedback*g);
+omega_of_g = @(g)(omega_gov_ref - k_feedback*g);
 if constant_governer
-    omega_of_g = @(g)omega_m_nom;
+    omega_of_g = @(g)omega_gov_ref;
 end
-[g1, q1]=turbineSteadyState(N_turb,omega_of_g,z_tailrace);
+[g1, q1]=turbineSteadyState(N_turb,omega_of_g);
 
 omega_m0 = omega_of_g(g1);
 omega_er0 = omega_m0*poles_number;
@@ -32,8 +33,6 @@ PID_i1 = g1/PID_Ki;
 
 hydro_state_1 = [q1, g1, PID_i1,pilot_servo1];
 
-% omega_m0 = omega_m_nom;
-% omega_er0 = omega_m_nom*poles_number;
 
 [psi_1,e_r_1,psi_2,e_r_2] =...
     generatorSteadyStateDan(i_ampl, phi_1,omega_er0);
