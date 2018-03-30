@@ -1,11 +1,12 @@
 function [e_r,dexciter_state] = exciterModelPI(v_q,v_d,exciter_state)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
-global exciter_PID_Ki exciter_PID_Kp constant_exciter e_r_const;
-v_emin = -10;
-v_emax = 10;
-v_rmin = -4.53;
-v_rmax = 5.64;
+global exciter_PID_Ki exciter_PID_Kp constant_exciter e_r_const...
+    v_emin v_emax v_rmin v_rmax;
+% v_emin = -10;
+% v_emax = 10;
+% v_rmin = -4.53;
+% v_rmax = 5.64;
 if constant_exciter
     e_r = e_r_const;
     dexciter_state = 0;

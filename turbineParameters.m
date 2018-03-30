@@ -10,7 +10,7 @@ global z_forebay z_turbine z_t1 z_t2 z_t3...
     part_load_freq...
     osc_Gs osc_ampl osc_tstep T_w T_e...
     rotor_inertia...
-    Q_base H_base G_base;
+    Q_base H_base G_base runner_inertia;
 
 %% % % 
 % physical constants
@@ -27,8 +27,8 @@ l_shaft = 7.17; % (m) shaft length
 m_shaft = 95.7*10^3; % (kg) shaft mass
 shaft_inertia = m_shaft*(r_shaft^2)/2;
 % Rotor inertia approximation for solid disc with radius R
-runner_inertia = runner_mass/2*(d_runner/2)^2;% (kg*m^2)
-complete_inertia = rotor_inertia+shaft_inertia+runner_inertia;
+runner_inertia = runner_mass/2*(d_runner/2)^2+shaft_inertia;% (kg*m^2)
+% complete_inertia = rotor_inertia+shaft_inertia+runner_inertia;
 %% % % % % Penstock parameters % % % % % % %
 roughness_height = 10^(-3); % (m) concrete roughness height
 % solve for Darcy friction factor in case of hughly tubulent flow

@@ -1,7 +1,7 @@
 function [] = printState(state)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
-global omega_m_nom G_base Q_base; 
+global omega_m_nom G_base Q_base S_base; 
 omega_m = state(1);
 q=state(2);
 g = state(3);
@@ -19,10 +19,13 @@ psi_rq = state(10);
 fprintf('omega_m=%.1f(rad/s) Q=%.0f(m^3/s) G=%.0f(mm) H_t=%.0f(m) H_{loss}=%.1f(m) PID_i=%.2f ps=%.1f\n',...
     omega_m,q*Q_base,g*G_base,H_turb,H_loss,...
     PID_i,ps);
-fprintf('psi_d=%.1f, psi_q=%.1f, psi_r=%.1f, psi_rd=%.1f, psi_rq=%.1f\n',...
-    psi_d,psi_q,psi_r,psi_rd,psi_rq);
-fprintf('v_d0=%.1f v_q0=%.1f i_d0=%.1f i_q0=%.1f\n',...
-    v_d,v_q,i_d,i_q);
+% fprintf('psi_d=%.1f, psi_q=%.1f, psi_r=%.1f, psi_rd=%.1f, psi_rq=%.1f\n',...
+%     psi_d,psi_q,psi_r,psi_rd,psi_rq);
+% fprintf('v_d0=%.1f v_q0=%.1f i_d0=%.1f i_q0=%.1f\n',...
+%     v_d,v_q,i_d,i_q);
+P_active = (v_d*i_d+v_q*i_q)*S_base/10^6;
+Q_reactive = (v_q*i_d-v_d*i_q)*S_base/10^6;
+fprintf('active=%.0fMW reactive=%.0fMW\n',P_active,Q_reactive);
 fprintf('e_1=%.1f\n',state(11));
 % dState = full_model(0,state);
 % fprintf('domega_m=%.1e(rad/s) dg=%.0e(mm) dq=%.0e(m^3/s) dPID_i=%.1e dps=%.1e\n',...

@@ -122,7 +122,7 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     reactive_powers = (v_qs.*i_ds-v_ds.*i_qs)*S_base/10^6;
     generator_torques = (psi_ds.*i_qs-psi_qs.*i_ds)*torque_base;
     generator_powers_pu = omega_ms.*generator_torques/10^6;
-    plot(t,active_powers,t,reactive_powers,t,Turbine_powers,t,generator_powers_pu);
+    plot(t,active_powers,t,reactive_powers,t,Turbine_powers/10^6,t,generator_powers_pu);
     legend('active load','reactive load','turbine','generator');
     xlabel('t');
     ylabel('power, MW');

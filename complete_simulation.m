@@ -24,7 +24,7 @@ global use_simple_gateflow_model use_constant_turbine_efficiency...
 
 %% % % configure simulation
 % number_of_simulations = 500;
-number_of_simulations = 1;
+number_of_simulations = 100;
 t_max = 20.0;
 sim_maxstep = 0.01;
 S_base = 640*10^6; % Base power, Watt, affects simulation stability
@@ -33,7 +33,7 @@ S_base = 640*10^6; % Base power, Watt, affects simulation stability
 PID_Kp=30;
 PID_Ki=2;
 k_feedback = 0.7;
-% PID_Kd must be small, otherwise unstable
+% K_dOmega must be small, otherwise unstable
 K_dOmega=0.0;
 
 
@@ -51,7 +51,7 @@ use_dead_zone = false;
 
 constant_generator_torque = false;
 phi_1 = acos(0.9);
-P_active0 = 100*10^6;
+P_active0 = 250*10^6;
 Q_reactive0 = P_active0/cos(phi_1)*sin(phi_1);
 % N_gen = -300*10^6; %W, generator power
 constant_exciter = false;
@@ -121,8 +121,9 @@ disp([eig(Jac1),eig(Jac2)]);
 % state = [initial_state];
 time = [0, t_max];
 for k=1:number_of_simulations
-%     initial_state = generate_state_near(steady_state);
-    initial_state = [14.7524    0.1055    0.1220    0.1806    0.1940   -0.9569   -0.1584   -0.9454   -1.2136   -0.1122   -0.6520];
+    initial_state = generate_state_near(steady_state);
+%     initial_state = [14.7524    0.1055    0.1220    0.1806    0.1940   -0.9569...
+%         -0.1584   -0.9454   -1.2136   -0.1122   -0.6520];
 %     initial_state = steady_state;
     printState(initial_state);
     options = odeset('MaxStep',sim_maxstep,'Events',@stop_integration_event);
