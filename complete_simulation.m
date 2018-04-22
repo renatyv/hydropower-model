@@ -20,7 +20,7 @@ global use_simple_gateflow_model use_constant_turbine_efficiency...
 %% % % configure simulation
 integration_stopper = false;
 enable_saturation = false;
-number_of_simulations = 1;
+number_of_simulations = 3;
 t_max = 20.0;
 sim_maxstep = 0.01;
 S_base = 640*10^6; % Base power, Watt, affects simulation stability
@@ -112,7 +112,8 @@ assert(max(abs(aut_model_nosat_nodz_ss2(steady_state_2)))<10^-3,'state 2 is not 
 time = [0, t_max];
 sim_model_1 = @(t,state)(full_model(t,state,e_r_1,enable_saturation,use_dead_zone));
 for k=1:number_of_simulations
-    initial_state = generate_state_near(steady_state_1);
+    max_distance = 0.05;
+    initial_state = generate_state_near(steady_state_1,max_distance);
     fprintf('initial state for simulation %d\n',k);
     printState(initial_state);
     options = odeset('MaxStep',sim_maxstep);
@@ -123,9 +124,10 @@ for k=1:number_of_simulations
     [t, state] = ode15s(sim_model_1, time, initial_state,options);
     [fig_1,fig_2] =...
         drawResults(t,state,steady_state_1,steady_state_2, plot_electric, plot_hydraulic);
-    saveas(fig_1,sprintf('sim_results/all_%d.png',k));
-    saveas(fig_2,sprintf('sim_results/phase_p_%d.png',k));
-    filename = sprintf('sim_results/data_%d',k);
+    file_name = sprintf('%.0fMW_sss%d',P_active0/10^6,k);
+    saveas(fig_1,sprintf('sim_results/all_%s.png',file_name));
+    saveas(fig_2,sprintf('sim_results/pp_%s.png',file_name));
+    filename = sprintf('sim_results/data_%s',file_name);
 %     save everything except fig_1, fig_2
     save(filename,'-regexp','^(?!(fig_1|fig_2)$).');
 end

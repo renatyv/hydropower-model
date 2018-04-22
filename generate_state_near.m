@@ -1,4 +1,4 @@
-function [near_state] = generate_state_near(state)
+function [near_state] = generate_state_near(state,epsilon)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 global gate_flow_coeff Q_base G_base Pilot_base Pilot_max Pilot_min G_min G_max S_base;
@@ -13,7 +13,7 @@ H= -0.5;
 P_active = 0;
 
 while H<100 || H>300 || P_active<0 || P_active>700
-    dState = (rand(size(state))-0.5)*0.1;
+    dState = (rand(size(state))-0.5)*epsilon;
     near_state = state+dState;
 %%     saturate the servos
     near_state(5) = sat(near_state(5),pilot_min,pilot_max);

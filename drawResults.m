@@ -63,7 +63,7 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     plot(gs,omega_ms,...
         g_steady,omega_steady,'go',...
         gs(1),omega_ms(1),'r*')
-    title(mat2str(steady_state_1,2));
+%     title(mat2str(steady_state_1,2));
     hold on;
     plot([g_min;g_max],[omega_max1,omega_max1],'b--');
     plot([g_min;g_max],[omega_min1,omega_min1],'b--');
@@ -82,8 +82,8 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     set(fig_1, 'Position', [10, 600, 800, 900]);
     subplot(3,2,1);
     plot(t,omega_ms,[t(1),t(end)],[omega_steady,omega_steady],'g');
-    title_str = strcat('initial:',mat2str(state(1,:),2));
-    title(title_str);
+%     title_str = strcat('initial:',mat2str(state(1,:),2));
+%     title(title_str);
     
     
     hold on;
