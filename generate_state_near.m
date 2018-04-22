@@ -13,7 +13,7 @@ H= -0.5;
 P_active = 0;
 
 while H<100 || H>300 || P_active<0 || P_active>700
-    dState = (rand(size(state))-0.5)*0.5;
+    dState = (rand(size(state))-0.5)*0.1;
     near_state = state+dState;
 %%     saturate the servos
     near_state(5) = sat(near_state(5),pilot_min,pilot_max);

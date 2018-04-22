@@ -1,4 +1,4 @@
-function [dg,dPID_i,dpilot_servo] = governerModel(g,PID_i,pilot_servo,omega_m,dOmega_m)
+function [dg,dPID_i,dpilot_servo] = governerModel(g,PID_i,pilot_servo,omega_m,dOmega_m,enable_saturation,use_dead_zone)
 %REGULATOR_MODEL Summary of this function goes here
 %   Detailed explanation goes here
 global PID_Kp PID_Ki K_dOmega...
@@ -6,7 +6,7 @@ global PID_Kp PID_Ki K_dOmega...
     G_max G_min G_base...
     T_pilotservo T_mainservo...
     Pilot_max Pilot_min Pilot_base...
-    constant_governer use_dead_zone...
+    constant_governer...
     k_feedback omega_gov_ref;
 
 if constant_governer
@@ -34,8 +34,8 @@ else
     pilot_min = Pilot_min/Pilot_base;
     g_max = G_max/G_base;
     g_min = G_min/G_base;
-    [dpilot_servo] = servoModel(pilot_in,pilot_servo,pilot_min,pilot_max,T_pilotservo);
-    [dg] = servoModel(pilot_servo,g,g_min,g_max,T_mainservo);
+    [dpilot_servo] = servoModel(pilot_in,pilot_servo,pilot_min,pilot_max,T_pilotservo,enable_saturation);
+    [dg] = servoModel(pilot_servo,g,g_min,g_max,T_mainservo,enable_saturation);
 end
 end
 

@@ -1,6 +1,7 @@
 function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2, plot_electric, plot_hydraulic)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
+
 global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     omega_er_base S_base torque_base...
     r_s T_r z_tailrace_const eta_Q_u eta_n_u eta_eta_u;
@@ -10,36 +11,20 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     
     omega_ms = state(:,1);
     omega_steady = steady_state_1(1);
-%     omega_ers = omega_ms*poles_number;
     omega_pus = omega_ms/omega_m_nom;
     qs = state(:,2);
     q_steady = steady_state_1(2);
     gs = state(:,3);
     g_steady = steady_state_1(3);
-%     Gs = gs*G_base;
     Qs = qs*Q_base;
-%     G_steady = g_steady*G_base;
     Q_steady = q_steady*Q_base;
-%     PID_is = state(:,4);
-%     PID_i_steady = steady_state_1(4);
     pilot_servos = state(:,5);
     pilot_servo_steady = steady_state_1(5);
     psi_ds = state(:,6);
-%     psi_d_steady_1 = steady_state_1(6);
-%     psi_d_steady_2 = steady_state_2(6);
     psi_qs = state(:,7);
-%     psi_q_steady_1 = steady_state_1(7);
-%     psi_q_steady_2 = steady_state_2(7);
     psi_rs = state(:,8);
-%     psi_r_steady_1 = steady_state_1(8);
-%     psi_r_steady_2 = steady_state_2(8);
     psi_rds = state(:,9);
-%     psi_rd_steady_1 = steady_state_1(9);
-%     psi_rd_steady_2 = steady_state_2(9);
     psi_rqs = state(:,10);
-%     psi_rq_steady_1 = steady_state_1(10);
-%     psi_rq_steady_2 = steady_state_2(10);
-% %     exciter_states = state(:,11);
     
 %    compute exciter voltage
     [e_qs,e_rqs,e_rds,i_qs,i_ds] = psi_to_E(psi_ds,psi_qs,psi_rs,psi_rds,psi_rqs);
@@ -71,20 +56,17 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     omega_min1 = omega_m_nom*(1-1/50);
     omega_max2 = omega_m_nom*(1+5/50);
     omega_min2 = omega_m_nom*(1-5/50);
-
+%%
     fig_2 = figure(2);
     g_min = min(gs);
     g_max = max(gs);
     plot(gs,omega_ms,...
         g_steady,omega_steady,'go',...
         gs(1),omega_ms(1),'r*')
+    title(mat2str(steady_state_1,2));
     hold on;
-%     if max(omega_ms)>omega_max1
-        plot([g_min;g_max],[omega_max1,omega_max1],'b--');
-%     end
-%     if min(omega_ms)<omega_min1
-        plot([g_min;g_max],[omega_min1,omega_min1],'b--');
-%     end
+    plot([g_min;g_max],[omega_max1,omega_max1],'b--');
+    plot([g_min;g_max],[omega_min1,omega_min1],'b--');
     if max(omega_ms)>omega_max2
         plot([g_min;g_max],[omega_max2,omega_max2],'r--');
     end
@@ -95,17 +77,18 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     xlabel('g');
     ylabel('omega_m');
 
+%%
     fig_1 = figure(1);
-    set(fig_1, 'Position', [10, 600, 800, 900])
+    set(fig_1, 'Position', [10, 600, 800, 900]);
     subplot(3,2,1);
     plot(t,omega_ms,[t(1),t(end)],[omega_steady,omega_steady],'g');
+    title_str = strcat('initial:',mat2str(state(1,:),2));
+    title(title_str);
+    
+    
     hold on;
-%     if max(omega_ms)>omega_max1
-        plot([t(1);t(end)],[omega_max1,omega_max1],'b--');
-%     end
-%     if min(omega_ms)<omega_min1
-        plot([t(1);t(end)],[omega_min1,omega_min1],'b--');
-%     end
+    plot([t(1);t(end)],[omega_max1,omega_max1],'b--');
+    plot([t(1);t(end)],[omega_min1,omega_min1],'b--');
     if max(omega_ms)>omega_max2
         plot([t(1);t(end)],[omega_max2,omega_max2],'r--');
     end
@@ -116,7 +99,6 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     xlabel('t');
     ylabel('omega_m');
     
-%     figure(2);
     subplot(3,2,2);
     active_powers = (v_ds.*i_ds+v_qs.*i_qs)*S_base/10^6;
     reactive_powers = (v_qs.*i_ds-v_ds.*i_qs)*S_base/10^6;

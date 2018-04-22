@@ -2,29 +2,25 @@ clear variables;
 clear global;
 global use_simple_gateflow_model use_constant_turbine_efficiency...
     simulate_vortex_rope_oscillations...
-    d_runner...
-    a_g rho...
-    omega_m_nom poles_number...
-    gate_flow_coeff...
+    omega_m_nom...
     PID_Kp PID_Ki K_dOmega...
-    turbine_eta_m turbine_const_efficiency...
+    turbine_const_efficiency...
     complete_inertia runner_inertia rotor_inertia...
     constant_turbine_torque constant_generator_torque...
-    omega_er_base...
     z_tailrace_const z_forebay...
-    e_r_const constant_exciter constant_governer...
+    constant_exciter constant_governer...
     P_active0 Q_reactive0...
     load_mode...
-    Q_base G_base S_base torque_base...
+    S_base...
     exciter_PID_Ki exciter_PID_Kp...
-    T_r r_s use_dead_zone Power_max...
-    use_integrator...
+    Power_max...
     N_turb_const omega_m_const T_m k_feedback;
 
 
 %% % % configure simulation
-% number_of_simulations = 500;
-number_of_simulations = 100;
+integration_stopper = false;
+enable_saturation = false;
+number_of_simulations = 1;
 t_max = 20.0;
 sim_maxstep = 0.01;
 S_base = 640*10^6; % Base power, Watt, affects simulation stability
@@ -35,11 +31,12 @@ PID_Ki=2;
 k_feedback = 0.7;
 % K_dOmega must be small, otherwise unstable
 K_dOmega=0.0;
-
+fprintf('governer K_p=%.1f, K_i=%.1f, K_d=%.1f, k_feedback=%.1f\n',PID_Kp,PID_Ki,K_dOmega,k_feedback);
 
 %% exciter governer parameters
 exciter_PID_Ki=2;
 exciter_PID_Kp=10;
+fprintf('exciter K_p=%.1f, K_i=%.1f\n',exciter_PID_Kp,exciter_PID_Ki);
 
 %% 0 -- constant MVA, 22 (a=b=2)-- constant impedance, 12 (a=1,b=2)
 load_mode = 22;
@@ -91,44 +88,39 @@ exciterParameters;
 % % % initial frequency in radian/s, electrical radian/s, HZ and rpm
 
 %% initial state
-[steady_state_1,steady_state_2,N_turb_steady,exciter_state_1,exciter_state_2] =...
+[steady_state_1,steady_state_2,N_turb_steady,e_r_1,e_r_2] =...
     get_steady_state(P_active0,Q_reactive0);
-steady_state = steady_state_2;
-e_r_const = exciter_state_2;
-% steady_state = steady_state_1;
-% e_r_const = exciter_state_1;
-N_turb_const = N_turb_steady;
-omega_m_const = steady_state(1);
-%% check that initial state is steady 
-aut_model =@(s)(full_model(0,s));
-disp('steady state');
-printState(steady_state);
-assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
-%% compute jacobian 
+disp('steady state 1');
+printState(steady_state_1);
+disp('steady state 2');
+printState(steady_state_2);
 
-if use_dead_zone
-    use_dead_zone = false;
-    Jac1 = NumJacob(aut_model,steady_state_1');
-    Jac2 = NumJacob(aut_model,steady_state_2');
-    use_dead_zone = true;
-else
-    Jac1 = NumJacob(aut_model,steady_state_1');
-    Jac2 = NumJacob(aut_model,steady_state_2');
-end
-disp([eig(Jac1),eig(Jac2)]);
+N_turb_const = N_turb_steady;
+omega_m_const = steady_state_1(1);
+
+%% compute jacobian 
+% assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
+aut_model_nosat_nodz_ss1 =@(s)(full_model(0,s,e_r_1,false,false));
+Jac1 = NumJacob(aut_model_nosat_nodz_ss1,steady_state_1');
+assert(max(abs(aut_model_nosat_nodz_ss1(steady_state_1)))<10^-3,'state 1 is not steady');
+
+aut_model_nosat_nodz_ss2 =@(s)(full_model(0,s,e_r_2,false,false));
+Jac2 = NumJacob(aut_model_nosat_nodz_ss2,steady_state_2');
+assert(max(abs(aut_model_nosat_nodz_ss2(steady_state_2)))<10^-3,'state 2 is not steady');
+% disp([eig(Jac1),eig(Jac2)]);
 %% simulation
-% t=[0];
-% state = [initial_state];
 time = [0, t_max];
+sim_model_1 = @(t,state)(full_model(t,state,e_r_1,enable_saturation,use_dead_zone));
 for k=1:number_of_simulations
-    initial_state = generate_state_near(steady_state);
-%     initial_state = [14.7524    0.1055    0.1220    0.1806    0.1940   -0.9569...
-%         -0.1584   -0.9454   -1.2136   -0.1122   -0.6520];
-%     initial_state = steady_state;
+    initial_state = generate_state_near(steady_state_1);
+    fprintf('initial state for simulation %d\n',k);
     printState(initial_state);
-    options = odeset('MaxStep',sim_maxstep,'Events',@stop_integration_event);
+    options = odeset('MaxStep',sim_maxstep);
+    if integration_stopper
+        options = odeset('MaxStep',sim_maxstep,'Events',@stop_integration_event);
+    end
 %     options = odeset('MaxStep',sim_maxstep);
-    [t, state] = ode15s(@full_model, time, initial_state,options);
+    [t, state] = ode15s(sim_model_1, time, initial_state,options);
     [fig_1,fig_2] =...
         drawResults(t,state,steady_state_1,steady_state_2, plot_electric, plot_hydraulic);
     saveas(fig_1,sprintf('sim_results/all_%d.png',k));
@@ -146,7 +138,7 @@ if plot_results
 end
 
 %% complete model 
-function [dstate] = full_model(t,state)
+function [dstate] = full_model(t,state,e_r_const,enable_saturation,use_dead_zone)
 global complete_inertia poles_number;
     omega_m = state(1);
     q = state(2);
@@ -166,12 +158,12 @@ global complete_inertia poles_number;
 
     [~,~,~,i_q,i_d] = psi_to_E(psi_d,psi_q,psi_r,psi_rd,psi_rq);
     [v_d,v_q] = loadModel(t,i_d,i_q,omega_m);
-    [e_r,dexciter_state] = exciterModelPI(v_q,v_d,exciter_state);
+    [e_r,dexciter_state] = exciterModelPI(v_q,v_d,exciter_state,enable_saturation,e_r_const);
     [ dpsi_d, dpsi_q, dpsi_r,dpsi_rd,dpsi_rq,Electric_torque] =...
             generatorModelDAN(psi_d,psi_q,psi_r,psi_rd,psi_rq,v_d,v_q,e_r,omega_er);
     dOmega_m = (Turbine_torque+Electric_torque)/complete_inertia;
     [dg,dPID_i,dpilot_servo] =...
-        governerModel(g,PID_i,pilot_servo,omega_m,dOmega_m);
+        governerModel(g,PID_i,pilot_servo,omega_m,dOmega_m,enable_saturation,use_dead_zone);
     dstate=[dOmega_m;...
         dq;dg;dPID_i;dpilot_servo;...
         dpsi_d; dpsi_q; dpsi_r;dpsi_rd;dpsi_rq;...
