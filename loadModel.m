@@ -1,6 +1,6 @@
 function [v_d,v_q] = loadModel(t,i_d,i_q,omega_m)
-%LOAD_MODEL Summary of this function goes here
-%   Detailed explanation goes here
+%LOAD_MODEL Implements load models
+%   load_mode ==
 global S_base P_active0 Q_reactive0 load_mode omega_m_nom;
 
 % constant MVA model
@@ -8,13 +8,13 @@ p_start = P_active0/S_base;
 q_reactive0 = Q_reactive0/S_base;
 % load_resistance0 = S_base/P_active0;
 step_start = 1.0;
-step_end = 2.0;
+step_end = 5.0;
 p_start = P_active0/S_base;
 q_start = Q_reactive0/S_base;
-p_end = p_start;
-q_end = q_start;
-% p_end = (P_active0+100*10^6)/S_base;
-% q_end = (Q_reactive0+100*10^6)/S_base;
+% p_end = p_start;
+% q_end = q_start;
+p_end = (200*10^6)/S_base;
+q_end = p_end*sin(acos(0.9))/0.9;
 p_active = rramp(p_start,p_end,step_start,step_end,t);
 q_reactive = rramp(q_start,q_end,step_start,step_end,t);
 % p_active = p_start;

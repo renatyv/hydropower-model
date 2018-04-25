@@ -1,8 +1,9 @@
 function [psi_1,e_r_1, psi_2,e_r_2] =...
     generatorSteadyStateDan(i0, phi_1,omega_er0)
-%% simulateModel sets paremeters
-% for system and starts modelling
-%
+%generatorSteadyStateDan computes steady state of the generator
+%   i0 --- current amplitude,
+%   phi_1 --- power coefficient, 
+%   omega_er0 --- rotor frequency
 global  x_0 x_D x_Q x_f x_ad x_q x_d x_aq omega_er_base...
 		r_s r_0 r_f I_ampl_base x_rq x_r x_rd S_base V_base I_base;
 %% compute steady state corresponding to initial load

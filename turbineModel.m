@@ -1,5 +1,5 @@
 function [ dq,Turbine_power,H_turb,H_loss] = turbineModel(t,g,q,omega_m)
-%HYDRAULIC_MODEL Summary of this function goes here
+%turbineModel models turbine
 %   Detailed explanation goes here
 global use_simple_gateflow_model use_constant_turbine_efficiency constant_turbine_torque...
     z_forebay...

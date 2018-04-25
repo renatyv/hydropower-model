@@ -1,16 +1,10 @@
 function [steady_state_1,steady_state_2,N_turb,e_r_1,e_r_2] =...
     get_steady_state(P_active0,Q_reactive0)
-%UNTITLED5 Summary of this function goes here
-%   Detailed explanation goes here
-global omega_m_nom poles_number torque_base S_base G_base Q_base r_s...
+%get_steady_state computes power plant state
+%   ex
+global poles_number S_base r_s...
     k_feedback constant_governer PID_Ki...
-    omega_gov_ref z_tailrace_const;
-% generatorParametersDAN;
-% turbineGovernerParameters;
-% exciterParameters;
-
-% % % initial frequency in radian/s, electrical radian/s, HZ and rpm
-
+    omega_gov_ref;
 %% generator steady torque
 phi_1 = atan(Q_reactive0/P_active0);
 i_ampl = P_active0/(S_base*cos(phi_1));
@@ -37,16 +31,12 @@ hydro_state_1 = [q1, g1, PID_i1,pilot_servo1];
 [psi_1,e_r_1,psi_2,e_r_2] =...
     generatorSteadyStateDan(i_ampl, phi_1,omega_er0);
 
-% For PI
+%% exciter steady state
 exciter_state_1  = e_r_1;
 exciter_state_2  = e_r_2;
-% exciter_state_1  = exciter_ac4aSteadyState(e_r_1);
-% exciter_state_2  = exciter_ac4aSteadyState(e_r_2);
 
+%% complete steady state
 steady_state_1 = [omega_m0,hydro_state_1,psi_1,exciter_state_1];
 steady_state_2 = [omega_m0,hydro_state_1,psi_2,exciter_state_2];
-
-% isStateSteady(initial_state_1,P_active0,Q_reactive0,z_tailrace,e_r1);
-% isStateSteady(initial_state_2,P_active0,Q_reactive0,z_tailrace,e_r2);
 end
 

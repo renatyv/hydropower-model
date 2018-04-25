@@ -1,5 +1,5 @@
-function [print_string] = printState(state)
-%UNTITLED2 Summary of this function goes here
+function [] = printState(state)
+%printState prints state to consolse in a pretty way
 %   Detailed explanation goes here
 global omega_m_nom G_base Q_base S_base; 
 % fprintf('(\omega_m,q,g,x_i,x_{ps},\psi_d,\psi_q,\psi_r,\psi_{rd},\psi_{rq},x_e)=(');

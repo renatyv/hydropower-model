@@ -1,6 +1,12 @@
 function [dg,dPID_i,dpilot_servo] = governerModel(g,PID_i,pilot_servo,omega_m,dOmega_m,enable_saturation,use_dead_zone)
-%REGULATOR_MODEL Summary of this function goes here
-%   Detailed explanation goes here
+%governerModel implements governer model
+%   enable_saturation=true enables servo motors saturation
+%   use_dead_zone=true enable input frequency dead zone
+%   g --- gate position, p.u.
+%   PID_i --- PID integrator state
+%   pilot_servo --- pilot servo state, p.u.
+%   omega_m --- rotor frequency, rad/s
+%   dOmega_m --- rotor frequency derivative rad/s^2
 global PID_Kp PID_Ki K_dOmega...
     omega_dead_zone...
     G_max G_min G_base...

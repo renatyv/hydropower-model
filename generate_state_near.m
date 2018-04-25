@@ -1,5 +1,5 @@
 function [near_state] = generate_state_near(state,epsilon)
-%UNTITLED Summary of this function goes here
+%generate_state_near generates valid steady state near the state within radius epsilon
 %   Detailed explanation goes here
 global gate_flow_coeff Q_base G_base Pilot_base Pilot_max Pilot_min G_min G_max S_base;
 pilot_max = Pilot_max/Pilot_base;

@@ -3,7 +3,7 @@
 %  e.g. spline(G_10n,G_10q,30)
 
 global eta_Q_u eta_n_u eta_eta_u eta_Qs eta_ns...
-    G_nq_q_f n_over_q_required G_required G_nq_q_i Qi_coeff G_n_q_f;
+    G_nq_q_f n_over_q_required G_required G_nq_q_i Qi_coeff G_n_q_f turbine_eta_m;
 
 G_10q = [130,125,100];
 G_10n = [56, 68, 85];

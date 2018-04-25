@@ -1,5 +1,6 @@
 function df=NumJacob(f,x0)
-
+%NumJacob computes Jacobian numerically
+%   computes Jacobian numerically
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 % This code was made by Youngmok Yun, UT Austin. 

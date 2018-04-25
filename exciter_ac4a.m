@@ -1,5 +1,5 @@
 function [e_r,dexciter_state] = exciter_ac4a(v_q,v_d,exciter_state)
-%UNTITLED Summary of this function goes here
+%UNTITLED IEEE AC4A exciter model
 %   Detailed explanation goes here
 global e_r_const v_emin v_emax v_rmin v_rmax T_A T_B T_C K_A v_fref K_C constant_exciter;
 dexciter_state = zeros(2,1);

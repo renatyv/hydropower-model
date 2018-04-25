@@ -1,5 +1,5 @@
 function [v] = rramp(v_start,v_end,t_start,t_end,t)
-%UNTITLED2 Summary of this function goes here
+%rramp goes from v_start to v_end linearly, constant otherwise
 %   Detailed explanation goes here
 v=zeros(size(t));
 for k=1:length(t)

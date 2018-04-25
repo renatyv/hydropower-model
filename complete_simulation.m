@@ -20,7 +20,7 @@ global use_simple_gateflow_model use_constant_turbine_efficiency...
 %% % % configure simulation
 integration_stopper = false;
 enable_saturation = false;
-number_of_simulations = 3;
+number_of_simulations = 1;
 t_max = 20.0;
 sim_maxstep = 0.01;
 S_base = 640*10^6; % Base power, Watt, affects simulation stability
@@ -48,18 +48,16 @@ use_dead_zone = false;
 
 constant_generator_torque = false;
 phi_1 = acos(0.9);
-P_active0 = 250*10^6;
+P_active0 = 600*10^6;
 Q_reactive0 = P_active0/cos(phi_1)*sin(phi_1);
 % N_gen = -300*10^6; %W, generator power
 constant_exciter = false;
 
-use_simple_gateflow_model = true;
-use_constant_turbine_efficiency = true;
+use_simple_gateflow_model = false;
+use_constant_turbine_efficiency = false;
 turbine_const_efficiency = 0.8;
 simulate_vortex_rope_oscillations = false;
 plot_results = true;
-plot_electric = true;
-plot_hydraulic = true;
 
 
 %% initialize parameters
@@ -87,7 +85,7 @@ governerParameters;
 exciterParameters;
 % % % initial frequency in radian/s, electrical radian/s, HZ and rpm
 
-%% initial state
+%% compute and print initial state
 [steady_state_1,steady_state_2,N_turb_steady,e_r_1,e_r_2] =...
     get_steady_state(P_active0,Q_reactive0);
 disp('steady state 1');
@@ -95,10 +93,11 @@ printState(steady_state_1);
 disp('steady state 2');
 printState(steady_state_2);
 
+%% for constant turbine power models set 
 N_turb_const = N_turb_steady;
 omega_m_const = steady_state_1(1);
 
-%% compute jacobian 
+%% compute jacobian and check local stability
 % assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
 aut_model_nosat_nodz_ss1 =@(s)(full_model(0,s,e_r_1,false,false));
 Jac1 = NumJacob(aut_model_nosat_nodz_ss1,steady_state_1');
@@ -113,7 +112,8 @@ time = [0, t_max];
 sim_model_1 = @(t,state)(full_model(t,state,e_r_1,enable_saturation,use_dead_zone));
 for k=1:number_of_simulations
     max_distance = 0.05;
-    initial_state = generate_state_near(steady_state_1,max_distance);
+%     initial_state = generate_state_near(steady_state_1,max_distance);
+    initial_state=steady_state_1;
     fprintf('initial state for simulation %d\n',k);
     printState(initial_state);
     options = odeset('MaxStep',sim_maxstep);
@@ -123,8 +123,9 @@ for k=1:number_of_simulations
 %     options = odeset('MaxStep',sim_maxstep);
     [t, state] = ode15s(sim_model_1, time, initial_state,options);
     [fig_1,fig_2] =...
-        drawResults(t,state,steady_state_1,steady_state_2, plot_electric, plot_hydraulic);
-    file_name = sprintf('%.0fMW_sss%d',P_active0/10^6,k);
+        drawResults(t,state,steady_state_1,steady_state_2);
+    % save sim results to files
+    file_name = sprintf('%.0fMW_load%d',P_active0/10^6,k);
     saveas(fig_1,sprintf('sim_results/all_%s.png',file_name));
     saveas(fig_2,sprintf('sim_results/pp_%s.png',file_name));
     filename = sprintf('sim_results/data_%s',file_name);
@@ -132,12 +133,10 @@ for k=1:number_of_simulations
     save(filename,'-regexp','^(?!(fig_1|fig_2)$).');
 end
 
-if plot_results
-    if number_of_simulations < 1
-        load 'sim_results/data_1';
-    end
-    drawResults(t,state,steady_state_1,steady_state_2, plot_electric, plot_hydraulic);
-end
+% if plot_results && (number_of_simulations < 1)
+%     load 'sim_results/data_1';
+%     drawResults(t,state,steady_state_1,steady_state_2);
+% end
 
 %% complete model 
 function [dstate] = full_model(t,state,e_r_const,enable_saturation,use_dead_zone)

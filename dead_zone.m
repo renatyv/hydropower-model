@@ -1,6 +1,6 @@
 function y = dead_zone(x,a,b)
-%DEAD_ZONE Summary of this function goes here
-%   Detailed explanation goes here
+%DEAD_ZONE governer dead zone
+%   zero within (a,b), linear outside of (a,b)
 if (x<=a) || (x>=b)
     y=x;
 else
