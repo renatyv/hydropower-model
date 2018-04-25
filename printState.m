@@ -1,8 +1,6 @@
 function [] = printState(state)
 %printState prints state to consolse in a pretty way
-%   Detailed explanation goes here
 global omega_m_nom G_base Q_base S_base; 
-% fprintf('(\omega_m,q,g,x_i,x_{ps},\psi_d,\psi_q,\psi_r,\psi_{rd},\psi_{rq},x_e)=(');
 fprintf('(');
 fprintf('%.2f,',state(1:end-1));
 fprintf('%.2f)\n',state(end));

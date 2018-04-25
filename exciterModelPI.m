@@ -1,12 +1,10 @@
 function [e_r,dexciter_state] = exciterModelPI(v_q,v_d,exciter_state,enable_saturation,e_r_const)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
-global exciter_PID_Ki exciter_PID_Kp constant_exciter...
-    v_emin v_emax v_rmin v_rmax;
-% v_emin = -10;
-% v_emax = 10;
-% v_rmin = -4.53;
-% v_rmax = 5.64;
+%exciterModelPI PI model of exciter governer with saturation
+global exciter_PID_Ki exciter_PID_Kp constant_exciter;
+v_emin = -5;
+v_emax = 5;
+v_rmin = -1;
+v_rmax = 1;
 if constant_exciter
     e_r = e_r_const;
     dexciter_state = 0;

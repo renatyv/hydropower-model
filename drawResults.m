@@ -1,6 +1,5 @@
 function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2)
-%UNTITLED draw simulation result figures
-%  draw two figures
+%drawResults draws state variables over time
 
 global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     omega_er_base S_base torque_base...

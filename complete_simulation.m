@@ -82,7 +82,6 @@ turbineParameters;
 complete_inertia=runner_inertia+rotor_inertia;
 T_m =complete_inertia*omega_m_nom^2/Power_max;
 governerParameters;
-exciterParameters;
 % % % initial frequency in radian/s, electrical radian/s, HZ and rpm
 
 %% compute and print initial state

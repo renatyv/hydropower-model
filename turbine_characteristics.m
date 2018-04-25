@@ -1,6 +1,4 @@
-% clear all;
-%     first and last values are extrapolated linearly with
-%  e.g. spline(G_10n,G_10q,30)
+% turbine universal characteristic
 
 global eta_Q_u eta_n_u eta_eta_u eta_Qs eta_ns...
     G_nq_q_f n_over_q_required G_required G_nq_q_i Qi_coeff G_n_q_f turbine_eta_m;
@@ -105,31 +103,6 @@ n_required = (min(G_n_i):1:max(G_n_i));
 G_n_q_i = griddata(G_v,G_n_i,G_q_i,G_u,G_n_u);
 
 G_n_q_f = griddedInterpolant(G_u,G_n_u,G_n_q_i);
-% G_nq_q_f2 = @(G,n_over_q)(interp2(G_v,Gn_over_q,G_q_i,G,n_over_q));
-
-% assert(G_nq_q_f(12,0.4)-G_nq_q_f2(12,0.4));
-
-%% % % % % % % % % % % % % n_i,q_i -> G % % % % % % % % 
-% % % % % necessary for computation of gates steady state
-% Qi_coeff = 1/7;
-% G_q_i = G_q_i*Qi_coeff;
-% 
-% Qs = (min(G_q_i):2:max(G_q_i));
-% ns = (min(G_n_i):2:max(G_v));
-% [n_u,q_u] = meshgrid(ns, Qs);
-% G_u = griddata(G_n_i,G_q_i,G_v,n_u,q_u);
-% % 
-% G_u = G_u'; % G values
-% n_u = n_u';
-% q_u=q_u';
-% %     figure(1);
-% %     mesh(n_u,q_u,G_u);
-% %     xlabel('n_i, G');
-% %     ylabel('q_i/10');
-% %     zlabel('G');
-% q_i_n_i_to_G = griddedInterpolant(n_u,q_u,G_u,'linear');
-% niqi_to_G = @(n_i,q_i)(q_i_n_i_to_G(n_i,q_i*Qi_coeff));
-
 
 %% q_i, n_i->eta
 nu_922q=[418,424];
@@ -188,15 +161,10 @@ nu_0q=[0,0,  30,30,30,30,35,40,100, 125, 150,158,700,700];
 nu_0n=[0,100,30,50,60,70,75,80,90,  96,  99,100, 0,  100];
 nu_0v=zeros(1,length(nu_0q));
 
-% global nu_q_i nu_n_i eta_i;
 nu_q_i = [nu_922q,nu_92q,nu_91q,nu_90q,nu_88q,nu_84q,nu_80q,nu_70q,nu_60q,nu_50q,nu_40q,nu_30q,nu_10q,nu_0q]; 
 nu_n_i = [nu_922n,nu_92n,nu_91n,nu_90n,nu_88n,nu_84n,nu_80n,nu_70n,nu_60n,nu_50n,nu_40n,nu_30n,nu_10n,nu_0n];
 eta_i = [nu_922v,nu_92v,nu_91v,nu_90v,nu_88v,nu_84v,nu_80v,nu_70v,nu_60v,nu_50v,nu_40v,nu_30v,nu_10v,nu_0v];
 
-% clear -regexp nu_\d\dq;
-% clear -regexp nu_\d\dn;
-% clear -regexp nu_\d\dv;
-% clear nu_0q nu_0v nu_0n;
 
 %     makes delanay triangulation adequate, because Q and n are of the same
 %     scale
@@ -211,10 +179,6 @@ eta_ns = 0:1:100;
 % q_i,n_i -> eta
 eta_eta_u = griddata(nu_q_i,nu_n_i,eta_i,eta_Q_u,eta_n_u);
 %     preparing data for griddedInterpolant, which is faster than interp2
-
-% eta_Q_u = eta_Q_u';
-% eta_n_u = eta_n_u';
-% eta_eta_u = eta_eta_u';
 
 q_in_i_to_eta = griddedInterpolant(eta_Q_u,eta_n_u,eta_eta_u);
 
