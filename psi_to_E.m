@@ -1,7 +1,8 @@
-function [e_q,e_rq,e_rd,i_q,i_d] = psi_to_E(psi_d,psi_q,psi_r,psi_rd,psi_rq)
+function [e_q,e_rq,e_rd,i_q,i_d] = psi_to_E(psi)
 %I_TO_PSI Solve flux-linkage equations
 %   Detailed explanation goes here
 global x_d x_q x_ad x_aq x_r x_rd x_rq;
+[psi_d,psi_q,psi_r,psi_rd,psi_rq] = parsePsi(psi);
 e_q = -(psi_d*x_ad^3 - psi_r*x_ad^2*x_r - psi_d*x_ad^2*x_rd + psi_rd*x_ad^2*x_rd - psi_rd*x_ad*x_d*x_rd + psi_r*x_d*x_r*x_rd)/...
     (x_ad^2*x_d + x_ad^2*x_r + x_ad^2*x_rd - 2*x_ad^3 - x_d*x_r*x_rd);
 e_rq =-(psi_d*x_ad^3 - psi_d*x_ad^2*x_r + psi_r*x_ad^2*x_r - psi_rd*x_ad^2*x_rd - psi_r*x_ad*x_d*x_r + psi_rd*x_d*x_r*x_rd)/...

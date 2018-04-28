@@ -25,7 +25,7 @@ omega_er0 = omega_m0*poles_number;
 pilot_servo1 = g1;
 PID_i1 = g1/PID_Ki;
 
-hydro_state_1 = [q1, g1, PID_i1,pilot_servo1];
+hydro_state_1 = [q1; g1; PID_i1;pilot_servo1];
 
 
 [psi_1,e_r_1,psi_2,e_r_2] =...
@@ -36,7 +36,7 @@ exciter_state_1  = e_r_1;
 exciter_state_2  = e_r_2;
 
 %% complete steady state
-steady_state_1 = [omega_m0,hydro_state_1,psi_1,exciter_state_1];
-steady_state_2 = [omega_m0,hydro_state_1,psi_2,exciter_state_2];
+steady_state_1 = [omega_m0;hydro_state_1;psi_1;exciter_state_1];
+steady_state_2 = [omega_m0;hydro_state_1;psi_2;exciter_state_2];
 end
 

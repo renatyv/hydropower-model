@@ -18,14 +18,32 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     Q_steady = q_steady*Q_base;
     pilot_servos = state(:,5);
     pilot_servo_steady = steady_state_1(5);
-    psi_ds = state(:,6);
-    psi_qs = state(:,7);
-    psi_rs = state(:,8);
-    psi_rds = state(:,9);
-    psi_rqs = state(:,10);
-    
+    % todo modify parsePsi to work with matrices)
+    psis = state(:,6:10);
+%     psi_ds = state(:,6);
+%     psi_qs = state(:,7);
+%     psi_rs = state(:,8);
+%     psi_rds = state(:,9);
+%     psi_rqs = state(:,10);
+    e_qs = zeros(size(omega_ms));
+    e_rqs = zeros(size(omega_ms));
+    e_rds = zeros(size(omega_ms));
+    i_qs = zeros(size(omega_ms));
+    i_ds = zeros(size(omega_ms));
 %%  compute stator and exciter voltages
-    [e_qs,e_rqs,e_rds,i_qs,i_ds] = psi_to_E(psi_ds,psi_qs,psi_rs,psi_rds,psi_rqs);
+    for k=1:length(omega_ms)
+        psi = psis(k,:);
+        [e_q,e_rq,e_rd,i_q,i_d] = psi_to_E(psi);
+        e_qs(k) = e_q;
+        e_rqs(k) = e_rq;
+        e_rds(k) = e_rd;
+        i_qs(k) = i_q;
+        i_ds(k) = i_d;
+    end
+    %TODO use parsePsi instead
+	psi_ds = psis(:,1);
+    psi_qs = psis(:,2);
+    psi_rs = psis(:,3);
     dPsi_ds = estimateDerivative(psi_ds,t);
     dPsi_qs = estimateDerivative(psi_qs,t);
     v_ds = -dPsi_ds/omega_er_base-omega_pus.*psi_qs-r_s*i_ds;

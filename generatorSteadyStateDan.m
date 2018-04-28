@@ -32,14 +32,15 @@ global  x_0 x_D x_Q x_f x_ad x_q x_d x_aq omega_er_base...
         psi_r = (x_ad^2)/x_r*i_d+e_q;
         psi_rd = (x_ad^2)/x_rd*i_d+x_ad/x_rd*e_q;
 %         t_shaft = -(psi_d*i_q-psi_q*i_d);
-        [e_q1,e_rq1,e_rd1,i_q1,i_d1] = psi_to_E(psi_d,psi_q,psi_r,psi_rd,psi_rq);
+        psi = constructPsi(psi_d,psi_q,psi_r,psi_rd,psi_rq);
+        [e_q1,e_rq1,e_rd1,i_q1,i_d1] = psi_to_E(psi);
         test_eps = 10^-6;
         assert(abs(e_q1-e_q)<test_eps,'wrong E_q');
         assert(abs(e_rq1-e_rq)<test_eps,'wrong E_rq');
         assert(abs(e_rd1-e_rd)<test_eps,'wrong E_rd');
         assert(abs(i_q1-i_q)<test_eps,'wrong i_q');
         assert(abs(i_d1-i_d)<test_eps,'wrong i_d');
-        psi = [psi_d,psi_q,psi_r,psi_rd,psi_rq];
+        
     end
     [psi_1,e_r_1] = compute_state(theta_er1);
     [psi_2,e_r_2] = compute_state(theta_er2);
