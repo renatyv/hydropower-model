@@ -141,8 +141,6 @@ end
 function [dstate] = full_model(t,state,e_r_const,enable_saturation,use_dead_zone)
 global complete_inertia poles_number;
     [omega_m,q,g,governer_state,psi,exciter_state] = parseState(state);
-    PID_i = governer_state(1);
-    pilot_servo = governer_state(2);
     omega_er = omega_m*poles_number; % electrical radians
     
     [ dq,Turbine_power,~,~] = turbineModel(t,g,q,omega_m);
@@ -151,13 +149,10 @@ global complete_inertia poles_number;
     [~,~,~,i_q,i_d] = psi_to_E(psi);
     [v_d,v_q] = loadModel(t,i_d,i_q,omega_m);
     [e_r,dexciter_state] = exciterModelPI(v_q,v_d,exciter_state,enable_saturation,e_r_const);
-    [ dpsi_d, dpsi_q, dpsi_r,dpsi_rd,dpsi_rq,Electric_torque] =...
+    [ dpsi,Electric_torque] =...
             generatorModelDAN(psi,v_d,v_q,e_r,omega_er);
-    dOmega_m = (Turbine_torque+Electric_torque)/complete_inertia;
-    [dg,dPID_i,dpilot_servo] =...
-        governerModel(g,PID_i,pilot_servo,omega_m,dOmega_m,enable_saturation,use_dead_zone);
-    dstate=[dOmega_m;...
-        dq;dg;dPID_i;dpilot_servo;...
-        dpsi_d; dpsi_q; dpsi_r;dpsi_rd;dpsi_rq;...
-        dexciter_state];
+    domega_m = (Turbine_torque+Electric_torque)/complete_inertia;
+    [dg,dgoverner_state] =...
+        governerModel(g,governer_state,omega_m,domega_m,enable_saturation,use_dead_zone);
+    dstate = constructState(domega_m,dq,dg,dgoverner_state,dpsi,dexciter_state);
 end

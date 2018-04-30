@@ -1,4 +1,4 @@
-function [dg,dPID_i,dpilot_servo] = governerModel(g,PID_i,pilot_servo,omega_m,dOmega_m,enable_saturation,use_dead_zone)
+function [dg,dgoverner_state] = governerModel(g,governer_state,omega_m,dOmega_m,enable_saturation,use_dead_zone)
 %governerModel implements governer model
 %   enable_saturation=true enables servo motors saturation
 %   use_dead_zone=true enable input frequency dead zone
@@ -20,6 +20,8 @@ if constant_governer
     dPID_i = 0;
     dpilot_servo = 0;
 else
+    PID_i = governer_state(1);
+    pilot_servo = governer_state(2);
     omega_delta = omega_gov_ref-omega_m;
     if use_dead_zone
         omega_delta = dead_zone(omega_delta,-omega_dead_zone/2,omega_dead_zone/2);
@@ -42,6 +44,7 @@ else
     g_min = G_min/G_base;
     [dpilot_servo] = servoModel(pilot_in,pilot_servo,pilot_min,pilot_max,T_pilotservo,enable_saturation);
     [dg] = servoModel(pilot_servo,g,g_min,g_max,T_mainservo,enable_saturation);
+    dgoverner_state = [dPID_i;dpilot_servo];
 end
 end
 
