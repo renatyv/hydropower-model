@@ -141,17 +141,8 @@ end
 function [dstate] = full_model(t,state,e_r_const,enable_saturation,use_dead_zone)
 global complete_inertia poles_number;
     [omega_m,q,g,governer_state,psi,exciter_state] = parseState(state);
-%     omega_m = state(1);
-%     q = state(2);
-%     g = state(3);
-    PID_i = state(4);
-    pilot_servo = state(5);
-%     psi_d = psi(1);
-%     psi_q = psi(2);
-%     psi_r = psi(3);
-%     psi_rd = psi(4);
-%     psi_rq = psi(5);
-    exciter_state = state(11);
+    PID_i = governer_state(1);
+    pilot_servo = governer_state(2);
     omega_er = omega_m*poles_number; % electrical radians
     
     [ dq,Turbine_power,~,~] = turbineModel(t,g,q,omega_m);
