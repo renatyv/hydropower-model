@@ -141,7 +141,6 @@ end
 function [dstate] = full_model(t,state,e_r_const,enable_saturation,use_dead_zone)
 global complete_inertia poles_number;
     [omega_m,q,g,governer_state,psi,exciter_state] = parseState(state);
-    omega_er = omega_m*poles_number; % electrical radians
     
     [ dq,Turbine_power,~,~] = turbineModel(t,g,q,omega_m);
     Turbine_torque = Turbine_power/omega_m;
@@ -149,6 +148,8 @@ global complete_inertia poles_number;
     [~,~,~,i_q,i_d] = psi_to_E(psi);
     [v_d,v_q] = loadModel(t,i_d,i_q,omega_m);
     [e_r,dexciter_state] = exciterModelPI(v_q,v_d,exciter_state,enable_saturation,e_r_const);
+    
+    omega_er = omega_m*poles_number; % electrical radians
     [ dpsi,Electric_torque] =...
             generatorModelDAN(psi,v_d,v_q,e_r,omega_er);
     domega_m = (Turbine_torque+Electric_torque)/complete_inertia;
