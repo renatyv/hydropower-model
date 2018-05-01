@@ -13,7 +13,7 @@ global PID_Kp PID_Ki K_dOmega...
     T_pilotservo T_mainservo...
     Pilot_max Pilot_min Pilot_base...
     constant_governer...
-    k_feedback omega_gov_ref;
+    K_f omega_gov_ref;
 
 if constant_governer
     dg = 0;
@@ -30,7 +30,7 @@ else
     if use_dead_zone && abs(omega_delta)<omega_dead_zone/2
         dOmega_deadzoned = 0;
     end
-    PI_in = omega_delta +K_dOmega*dOmega_deadzoned - k_feedback*g;
+    PI_in = omega_delta +K_dOmega*dOmega_deadzoned - K_f*g;
     
     dPID_i = PI_in;
     

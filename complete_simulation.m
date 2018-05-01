@@ -14,7 +14,7 @@ global use_simple_gateflow_model use_constant_turbine_efficiency...
     S_base...
     exciter_PID_Ki exciter_PID_Kp...
     Power_max...
-    N_turb_const omega_m_const T_m k_feedback;
+    N_turb_const omega_m_const T_m K_f;
 
 
 %% % % configure simulation
@@ -28,10 +28,10 @@ S_base = 640*10^6; % Base power, Watt, affects simulation stability
 %% turbine governer parameters
 PID_Kp=30;
 PID_Ki=2;
-k_feedback = 0.7;
+K_f = 0.7;
 % K_dOmega must be small, otherwise unstable
 K_dOmega=0.0;
-fprintf('governer K_p=%.1f, K_i=%.1f, K_d=%.1f, k_feedback=%.1f\n',PID_Kp,PID_Ki,K_dOmega,k_feedback);
+fprintf('governer K_p=%.1f, K_i=%.1f, K_d=%.1f, K_f=%.1f\n',PID_Kp,PID_Ki,K_dOmega,K_f);
 
 %% exciter governer parameters
 exciter_PID_Ki=2;

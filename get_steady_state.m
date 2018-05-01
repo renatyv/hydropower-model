@@ -3,7 +3,7 @@ function [steady_state_1,steady_state_2,N_turb,e_r_1,e_r_2] =...
 %get_steady_state computes power plant state
 %   ex
 global poles_number S_base r_s...
-    k_feedback constant_governer PID_Ki...
+    K_f constant_governer PID_Ki...
     omega_gov_ref;
 %% generator steady torque
 phi_1 = atan(Q_reactive0/P_active0);
@@ -12,7 +12,7 @@ N_gen = -((i_ampl^2)*r_s*S_base+P_active0);
 N_turb = -N_gen;
 
 %% turbine and vogerner steady state
-omega_of_g = @(g)(omega_gov_ref - k_feedback*g);
+omega_of_g = @(g)(omega_gov_ref - K_f*g);
 if constant_governer
     omega_of_g = @(g)omega_gov_ref;
 end
@@ -26,7 +26,7 @@ pilot_servo1 = g0;
 PID_i1 = g0/PID_Ki;
 gov_state0 = [PID_i1;pilot_servo1];
 
-%% generator steady state
+%% generator steady states
 [psi_1,e_r_1,psi_2,e_r_2] =...
     generatorSteadyStateDan(i_ampl, phi_1,omega_er0);
 

@@ -20,11 +20,6 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     pilot_servo_steady = steady_state_1(5);
     % todo modify parsePsi to work with matrices)
     psis = state(:,6:10);
-%     psi_ds = state(:,6);
-%     psi_qs = state(:,7);
-%     psi_rs = state(:,8);
-%     psi_rds = state(:,9);
-%     psi_rqs = state(:,10);
     e_qs = zeros(size(omega_ms));
     e_rqs = zeros(size(omega_ms));
     e_rds = zeros(size(omega_ms));
