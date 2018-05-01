@@ -28,7 +28,7 @@ gov_state0 = [PID_i1;pilot_servo1];
 
 %% generator steady states
 [psi_1,e_r_1,psi_2,e_r_2] =...
-    generatorSteadyStateDan(i_ampl, phi_1,omega_er0);
+    generatorSteadyState(i_ampl, phi_1,omega_er0);
 
 %% exciter steady state
 exciter_state_1  = e_r_1;

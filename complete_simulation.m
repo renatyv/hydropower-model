@@ -77,7 +77,7 @@ z_turbine = 314; % (m) turbine height
 z_tailrace_const = z_t3; % tailrace
 
 %% models parameters
-generatorParametersDAN;
+generatorParameters;
 turbineParameters;
 complete_inertia=runner_inertia+rotor_inertia;
 T_m =complete_inertia*omega_m_nom^2/Power_max;
@@ -151,7 +151,7 @@ global complete_inertia poles_number;
     
     omega_er = omega_m*poles_number; % electrical radians
     [ dpsi,Electric_torque] =...
-            generatorModelDAN(psi,v_d,v_q,e_r,omega_er);
+            generatorModel(psi,v_d,v_q,e_r,omega_er);
     domega_m = (Turbine_torque+Electric_torque)/complete_inertia;
     [dg,dgoverner_state] =...
         governerModel(g,governer_state,omega_m,domega_m,enable_saturation,use_dead_zone);
