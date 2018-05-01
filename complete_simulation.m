@@ -111,8 +111,8 @@ time = [0, t_max];
 sim_model_1 = @(t,state)(full_model(t,state,e_r_1,enable_saturation,use_dead_zone));
 for k=1:number_of_simulations
     max_distance = 0.05;
-%     initial_state = generate_state_near(steady_state_1,max_distance);
-    initial_state=steady_state_1;
+    initial_state = generate_state_near(steady_state_1,max_distance);
+%     initial_state=steady_state_1;
     fprintf('initial state for simulation %d\n',k);
     printState(initial_state);
     options = odeset('MaxStep',sim_maxstep);
