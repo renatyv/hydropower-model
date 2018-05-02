@@ -25,14 +25,6 @@ t_max = 20.0;
 sim_maxstep = 0.01;
 S_base = 640*10^6; % Base power, Watt, affects simulation stability
 
-%% turbine governer parameters
-PID_Kp=30;
-PID_Ki=2;
-K_f = 0.7;
-% K_dOmega must be small, otherwise unstable
-K_dOmega=0.0;
-fprintf('governer K_p=%.1f, K_i=%.1f, K_d=%.1f, K_f=%.1f\n',PID_Kp,PID_Ki,K_dOmega,K_f);
-
 %% exciter governer parameters
 exciter_PID_Ki=2;
 exciter_PID_Kp=10;
@@ -81,12 +73,12 @@ generatorParameters;
 turbineParameters;
 complete_inertia=runner_inertia+rotor_inertia;
 T_m =complete_inertia*omega_m_nom^2/Power_max;
-gov_params = GovernerParameters();
+gov_model = GovernerModel1();
 % % % initial frequency in radian/s, electrical radian/s, HZ and rpm
 
 %% compute and print initial state
 [steady_state_1,steady_state_2,N_turb_steady,e_r_1,e_r_2] =...
-    get_steady_state(gov_params,P_active0,Q_reactive0);
+    get_steady_state(gov_model,P_active0,Q_reactive0);
 disp('steady state 1');
 printState(steady_state_1);
 disp('steady state 2');
@@ -98,20 +90,20 @@ omega_m_const = steady_state_1(1);
 
 %% compute jacobian and check local stability
 % assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
-aut_model_nosat_nodz_ss1 =@(s)(full_model(0,s,e_r_1,false,false,gov_params));
+aut_model_nosat_nodz_ss1 =@(s)(full_model(0,s,e_r_1,false,false,gov_model));
 Jac1 = NumJacob(aut_model_nosat_nodz_ss1,steady_state_1');
 assert(max(abs(aut_model_nosat_nodz_ss1(steady_state_1)))<10^-3,'state 1 is not steady');
 
-aut_model_nosat_nodz_ss2 =@(s)(full_model(0,s,e_r_2,false,false,gov_params));
+aut_model_nosat_nodz_ss2 =@(s)(full_model(0,s,e_r_2,false,false,gov_model));
 Jac2 = NumJacob(aut_model_nosat_nodz_ss2,steady_state_2');
 assert(max(abs(aut_model_nosat_nodz_ss2(steady_state_2)))<10^-3,'state 2 is not steady');
 % disp([eig(Jac1),eig(Jac2)]);
 %% simulation
 time = [0, t_max];
-sim_model_1 = @(t,state)(full_model(t,state,e_r_1,enable_saturation,use_dead_zone,gov_params));
+sim_model_1 = @(t,state)(full_model(t,state,e_r_1,enable_saturation,use_dead_zone,gov_model));
 for k=1:number_of_simulations
     max_distance = 0.05;
-    initial_state = generate_state_near(gov_params,steady_state_1,max_distance);
+    initial_state = generate_state_near(gov_model,steady_state_1,max_distance);
 %     initial_state=steady_state_1;
     fprintf('initial state for simulation %d\n',k);
     printState(initial_state);
