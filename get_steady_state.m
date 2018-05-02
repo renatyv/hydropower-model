@@ -21,9 +21,7 @@ omega_m0 = omega_of_g(g0);
 omega_er0 = omega_m0*poles_number;
 
 %% governer steady state
-pilot_servo1 = g0;
-PID_i1 = g0/governer_params.PID_Ki;
-gov_state0 = [PID_i1;pilot_servo1];
+gov_state0 = governer_params.steady(g0);
 
 %% generator steady states
 [psi_1,e_r_1,psi_2,e_r_2] =...

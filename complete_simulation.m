@@ -154,6 +154,6 @@ global complete_inertia poles_number;
             generatorModel(psi,v_d,v_q,e_r,omega_er);
     domega_m = (Turbine_torque+Electric_torque)/complete_inertia;
     [dg,dgoverner_state] =...
-        governerModel(gov_params,g,governer_state,omega_m,domega_m,enable_saturation,use_dead_zone);
+        gov_params.model(g,governer_state,omega_m,domega_m,enable_saturation,use_dead_zone);
     dstate = constructState(domega_m,dq,dg,dgoverner_state,dpsi,dexciter_state);
 end
