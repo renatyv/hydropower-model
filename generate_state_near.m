@@ -1,4 +1,4 @@
-function [near_state] = generate_state_near(state,epsilon)
+function [near_state] = generate_state_near(gov_params,state,epsilon)
 %generate_state_near generates valid steady state near the state within radius epsilon
 %   Detailed explanation goes here
 global gate_flow_coeff Q_base G_base Pilot_base Pilot_max Pilot_min G_min G_max S_base;
@@ -16,7 +16,7 @@ while H<100 || H>300 || P_active<0 || P_active>700
     dState = (rand(size(state))-0.5)*epsilon;
     near_state = state+dState;
 %%     saturate the servos
-    near_state(5) = sat(near_state(5),pilot_min,pilot_max);
+    near_state(5) = sat(near_state(5),gov_params.pilot_min,gov_params.pilot_max);
     near_state(3) = sat(near_state(3),g_min,g_max);
     G = near_state(3)*G_base;
     Q = near_state(2)*Q_base;
