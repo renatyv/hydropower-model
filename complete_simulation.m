@@ -131,7 +131,7 @@ end
 % end
 
 %% complete model 
-function [dstate] = full_model(t,state,e_r_const,enable_saturation,use_dead_zone,gov_params)
+function [dstate] = full_model(t,state,e_r_const,enable_saturation,use_dead_zone,gov_model)
 global complete_inertia poles_number;
     [omega_m,q,g,governer_state,psi,exciter_state] = parseState(state);
     
@@ -147,6 +147,6 @@ global complete_inertia poles_number;
             generatorModel(psi,v_d,v_q,e_r,omega_er);
     domega_m = (Turbine_torque+Electric_torque)/complete_inertia;
     [dg,dgoverner_state] =...
-        gov_params.model(g,governer_state,omega_m,domega_m,enable_saturation,use_dead_zone);
+        gov_model.model(g,governer_state,omega_m,domega_m,enable_saturation,use_dead_zone);
     dstate = constructState(domega_m,dq,dg,dgoverner_state,dpsi,dexciter_state);
 end
