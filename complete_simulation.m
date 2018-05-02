@@ -70,6 +70,7 @@ z_tailrace_const = z_t3; % tailrace
 
 %% models parameters
 generatorParameters;
+gen_model = GenModel();
 turbineParameters;
 complete_inertia=runner_inertia+rotor_inertia;
 T_m =complete_inertia*omega_m_nom^2/Power_max;
