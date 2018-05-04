@@ -3,11 +3,12 @@ function [g0, q0]=turbineSteadyState(N_turb,omega_of_g)
 %   omega_of_g --- function that matches static rotor frequency to the gate
 %   opening
 
-global Q_base S_base;
+global Q_base;
+
+S_base = 640*10^6;
 function dq = turb_model(x)
     q=x(1);
     g=x(2);
-    Q=q*Q_base;
     [ dqq,Turbine_power,~,~] = turbineModel(0,g,q,omega_of_g(g));
     dq = dqq.^2+(N_turb/S_base-Turbine_power/S_base)^2;
 end

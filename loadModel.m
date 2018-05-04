@@ -1,7 +1,9 @@
-function [v_d,v_q] = loadModel(t,i_d,i_q,omega_m)
+function [v_d,v_q] = loadModel(t,i_d,i_q,omega_m,gen_power_base,omega_m_nom)
 %LOAD_MODEL Implements load models
 %   load_mode ==
-global S_base P_active0 Q_reactive0 load_mode omega_m_nom;
+global P_active0 Q_reactive0 load_mode;
+
+S_base = gen_power_base;
 
 % constant MVA model
 p_start = P_active0/S_base;

@@ -1,5 +1,5 @@
 function [psi_1,e_r_1, psi_2,e_r_2] =...
-    generatorSteadyStateDan(i0, phi_1,omega_er0)
+    generatorSteadyState(i0, phi_1,omega_er0)
 %generatorSteadyStateDan computes steady state of the generator
 %   i0 --- current amplitude,
 %   phi_1 --- power coefficient, 

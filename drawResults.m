@@ -1,4 +1,4 @@
-function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2)
+function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_model)
 %drawResults draws state variables over time
 
 global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
@@ -28,7 +28,7 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
 %%  compute stator and exciter voltages
     for k=1:length(omega_ms)
         psi = psis(k,:);
-        [e_q,e_rq,e_rd,i_q,i_d] = psi_to_E(psi);
+        [e_q,e_rq,e_rd,i_q,i_d] = gen_model.psi_to_E(psi);
         e_qs(k) = e_q;
         e_rqs(k) = e_rq;
         e_rds(k) = e_rd;
@@ -41,10 +41,10 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     psi_rs = psis(:,3);
     dPsi_ds = estimateDerivative(psi_ds,t);
     dPsi_qs = estimateDerivative(psi_qs,t);
-    v_ds = -dPsi_ds/omega_er_base-omega_pus.*psi_qs-r_s*i_ds;
-    v_qs = -dPsi_qs/omega_er_base+omega_pus.*psi_ds-r_s*i_qs;
+    v_ds = -dPsi_ds/gen_model.omega_er_base-omega_pus.*psi_qs-gen_model.r_s*i_ds;
+    v_qs = -dPsi_qs/gen_model.omega_er_base+omega_pus.*psi_ds-gen_model.r_s*i_qs;
     dPsi_rs = estimateDerivative(psi_rs,t);
-    e_rs=(dPsi_rs*T_r+e_qs);
+    e_rs=(dPsi_rs*gen_model.T_r+e_qs);
     
 %%     compute turbine power
     Turbine_powers = zeros(size(Qs));
@@ -108,9 +108,9 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     ylabel('omega_m');
     %% Active, reactive, turbine power
     subplot(3,2,2);
-    active_powers = (v_ds.*i_ds+v_qs.*i_qs)*S_base/10^6;
-    reactive_powers = (v_qs.*i_ds-v_ds.*i_qs)*S_base/10^6;
-    generator_torques = (psi_ds.*i_qs-psi_qs.*i_ds)*torque_base;
+    active_powers = (v_ds.*i_ds+v_qs.*i_qs)*gen_model.S_base/10^6;
+    reactive_powers = (v_qs.*i_ds-v_ds.*i_qs)*gen_model.S_base/10^6;
+    generator_torques = (psi_ds.*i_qs-psi_qs.*i_ds)*gen_model.torque_base;
     generator_powers_pu = omega_ms.*generator_torques/10^6;
     plot(t,active_powers,t,reactive_powers,t,Turbine_powers/10^6,t,generator_powers_pu);
     legend('active load','reactive load','turbine','generator');

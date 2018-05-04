@@ -14,7 +14,9 @@ global use_simple_gateflow_model use_constant_turbine_efficiency constant_turbin
     simulate_vortex_rope_oscillations...
     N_turb_const z_tailrace_const;
 
-
+assert(~isempty(g),'g is undefined %.2f',g);
+assert(~isempty(q),'q is undefined %.2f',q);
+assert(~isempty(omega_m),'omega_m is undefined %.2f',omega_m);
 if constant_turbine_torque
     dq = 0;
     Turbine_power = N_turb_const;
@@ -61,4 +63,8 @@ else
     end
     Turbine_power = rho*a_g*Q*H_turb*turbine_efficiency;
 end
+assert(~isempty(dq),'dq is undefined');
+assert(~isempty(Turbine_power),'Turbine_power is undefined');
+assert(~isempty(H_turb),'H_turb is undefined');
+assert(~isempty(H_loss),'H_loss is undefined');
 end
