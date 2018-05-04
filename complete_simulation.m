@@ -8,12 +8,7 @@ number_of_simulations = 1;
 t_max = 20.0;
 sim_maxstep = 0.01;
 
-% %% exciter governer parameters
-% fprintf('exciter K_p=%.1f, K_i=%.1f\n',exciter_PID_Kp,exciter_PID_Ki);
-
 %% configuration
-
-% N_gen = -300*10^6; %W, generator power
 
 plot_results = true;
 
@@ -21,9 +16,9 @@ plot_results = true;
 gen_model = GenModel();
 turb_model = TurbineModel1();
 exciter_model = ExciterPIModel();
-% T_m =complete_inertia*omega_m_nom^2/Power_max;
 gov_model = GovernerModel1();
 load_model = LoadModelPQ();
+% T_m =complete_inertia*omega_m_nom^2/Power_max;
 % % % initial frequency in radian/s, electrical radian/s, HZ and rpm
 
 %% compute and print initial state
