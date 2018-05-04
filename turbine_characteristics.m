@@ -93,16 +93,16 @@ G_nq_q_f = griddedInterpolant(G_u,G_nq_u,G_nq_q_i);
 % assert(G_nq_q_f(12,0.4)-G_nq_q_f2(12,0.4));
 
 %% % % % % % % % % % % % (G,n_i) -> q_i % % % % % % % % 
-
-% construct uniform grid
-G_required = (min(G_v):1:max(G_v));
-n_required = (min(G_n_i):1:max(G_n_i));
-[G_u,G_n_u] = ndgrid(G_required, n_required);
-% interpolate over uniform grid 
-% vq = griddata(x,y,v,xq,yq); x,y,v - data; xq, vq - grid
-G_n_q_i = griddata(G_v,G_n_i,G_q_i,G_u,G_n_u);
-
-G_n_q_f = griddedInterpolant(G_u,G_n_u,G_n_q_i);
+% 
+% % construct uniform grid
+% G_required = (min(G_v):1:max(G_v));
+% n_required = (min(G_n_i):1:max(G_n_i));
+% [G_u,G_n_u] = ndgrid(G_required, n_required);
+% % interpolate over uniform grid 
+% % vq = griddata(x,y,v,xq,yq); x,y,v - data; xq, vq - grid
+% G_n_q_i = griddata(G_v,G_n_i,G_q_i,G_u,G_n_u);
+% 
+% G_n_q_f = griddedInterpolant(G_u,G_n_u,G_n_q_i);
 
 %% q_i, n_i->eta
 nu_922q=[418,424];

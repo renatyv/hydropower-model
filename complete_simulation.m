@@ -50,62 +50,53 @@ simulate_vortex_rope_oscillations = false;
 plot_results = true;
 
 
-%% initialize parameters
-rpm_nom = 142.8; % revolutions per minute nomial frequency
-omega_m_nom = rpm_nom/60*2*pi; %(rad/s), mechanical frequency of the rotor
-%% % % Forebay and tailrace parameters
-% forebay parameters
-z_fnorm = 539; % (m) forebay operating level
-z_fmax = 540; % (m)forebay max level
-z_fmin = 500; % (m)forebay min level
-z_forebay = z_fnorm;
-z_t1 = 319; % (m)maynskaya GES forebay 1
-z_t2 = 327; % (m) maynskaya GES forebay 2
-z_t3 = 331; % (m)maynskaya GES forebay 3
-z_mayn = 324; % (m) maynskaya GES forebay operating level
-z_turbine = 314; % (m) turbine height
-z_tailrace_const = z_t3; % tailrace
+% %% initialize parameters
+% rpm_nom = 142.8; % revolutions per minute nomial frequency
+% omega_m_nom = rpm_nom/60*2*pi; %(rad/s), mechanical frequency of the rotor
 
 %% models parameters
 % generatorParameters;
 gen_model = GenModel();
-turbineParameters;
-complete_inertia=runner_inertia+rotor_inertia;
-T_m =complete_inertia*omega_m_nom^2/Power_max;
+% turbineParameters;
+turb_model = TurbineModel1();
+% T_m =complete_inertia*omega_m_nom^2/Power_max;
 gov_model = GovernerModel1();
 % % % initial frequency in radian/s, electrical radian/s, HZ and rpm
 
 %% compute and print initial state
 [steady_state_1,steady_state_2,N_turb_steady,e_r_1,e_r_2] =...
-    get_steady_state(gov_model,gen_model,P_active0,Q_reactive0);
+    get_steady_state(gov_model,gen_model,turb_model,P_active0,Q_reactive0);
 disp('steady state 1');
-printState(steady_state_1,gen_model);
+printState(steady_state_1,gen_model,turb_model);
 disp('steady state 2');
-printState(steady_state_2,gen_model);
+printState(steady_state_2,gen_model,turb_model);
 
 %% for constant turbine power models set 
-N_turb_const = N_turb_steady;
-omega_m_const = steady_state_1(1);
+turb_model.constant_turbine_power = N_turb_steady;
+turb_model.constant_turbine_speed = steady_state_1(1);
 
 %% compute jacobian and check local stability
 % assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
-aut_model_nosat_nodz_ss1 =@(s)(full_model(0,s,e_r_1,false,false,gov_model,gen_model));
+model = @(t,state,e_r_const,enable_saturation,use_dead_zone)...
+    full_model(t,state,e_r_const,enable_saturation,use_dead_zone,gov_model,gen_model,turb_model);
+
+aut_model_nosat_nodz_ss1 =@(s)(model(0,s,e_r_1,false,false));
 Jac1 = NumJacob(aut_model_nosat_nodz_ss1,steady_state_1');
 assert(max(abs(aut_model_nosat_nodz_ss1(steady_state_1)))<10^-3,'state 1 is not steady');
 
-aut_model_nosat_nodz_ss2 =@(s)(full_model(0,s,e_r_2,false,false,gov_model,gen_model));
+aut_model_nosat_nodz_ss2 =@(s)(model(0,s,e_r_2,false,false));
 Jac2 = NumJacob(aut_model_nosat_nodz_ss2,steady_state_2');
 assert(max(abs(aut_model_nosat_nodz_ss2(steady_state_2)))<10^-3,'state 2 is not steady');
 % disp([eig(Jac1),eig(Jac2)]);
 %% simulation
 time = [0, t_max];
-sim_model_1 = @(t,state)(full_model(t,state,e_r_1,enable_saturation,use_dead_zone,gov_model,gen_model));
+sim_model_1 = @(t,state)(model(t,state,e_r_1,enable_saturation,use_dead_zone));
 for k=1:number_of_simulations
     max_distance = 0.05;
-    initial_state = generate_state_near(gov_model,gen_model,steady_state_1,max_distance);
+    initial_state = generate_state_near(gov_model,gen_model,turb_model,steady_state_1,max_distance);
 %     initial_state=steady_state_1;
     fprintf('initial state for simulation %d\n',k);
-    printState(initial_state,gen_model);
+    printState(initial_state,gen_model,turb_model);
     options = odeset('MaxStep',sim_maxstep);
     if integration_stopper
         options = odeset('MaxStep',sim_maxstep,'Events',@stop_integration_event);
@@ -113,7 +104,7 @@ for k=1:number_of_simulations
 %     options = odeset('MaxStep',sim_maxstep);
     [t, state] = ode15s(sim_model_1, time, initial_state,options);
     [fig_1,fig_2] =...
-        drawResults(t,state,steady_state_1,steady_state_2,gen_model);
+        drawResults(t,state,steady_state_1,steady_state_2,gen_model,turb_model);
     % save sim results to files
     file_name = sprintf('%.0fMW_load%d',P_active0/10^6,k);
     saveas(fig_1,sprintf('sim_results/all_%s.png',file_name));
@@ -123,16 +114,11 @@ for k=1:number_of_simulations
     save(filename,'-regexp','^(?!(fig_1|fig_2)$).');
 end
 
-% if plot_results && (number_of_simulations < 1)
-%     load 'sim_results/data_1';
-%     drawResults(t,state,steady_state_1,steady_state_2);
-% end
-
 %% complete model 
-function [dstate] = full_model(t,state,e_r_const,enable_saturation,use_dead_zone,gov_model,gen_model)
+function [dstate] = full_model(t,state,e_r_const,enable_saturation,use_dead_zone,gov_model,gen_model,turb_model)
     [omega_m,q,g,governer_state,psi,exciter_state] = parseState(state);
     
-    [ dq,Turbine_power,~,~] = turbineModel(t,g,q,omega_m);
+    [ dq,Turbine_power,~,~] = turb_model.model(t,g,q,omega_m);
     Turbine_torque = Turbine_power/omega_m;
 
     [~,~,~,i_q,i_d] = gen_model.psi_to_E(psi);
@@ -142,7 +128,8 @@ function [dstate] = full_model(t,state,e_r_const,enable_saturation,use_dead_zone
     [ dpsi,Electric_torque] =...
             gen_model.model(psi,v_d,v_q,e_r,omega_m);
 %         TODO add turbine inertia
-    domega_m = (Turbine_torque+Electric_torque)/(gen_model.rotor_inertia);
+    complete_inertia = gen_model.rotor_inertia+turb_model.runner_inertia;
+    domega_m = (Turbine_torque+Electric_torque)/complete_inertia;
     [dg,dgoverner_state] =...
         gov_model.model(g,governer_state,omega_m,domega_m,enable_saturation,use_dead_zone);
     dstate = constructState(domega_m,dq,dg,dgoverner_state,dpsi,dexciter_state);

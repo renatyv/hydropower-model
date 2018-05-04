@@ -1,11 +1,9 @@
-function [near_state] = generate_state_near(gov_model,gen_model,state,epsilon)
+function [near_state] = generate_state_near(gov_model,gen_model,turb_model,state,epsilon)
 %generate_state_near generates valid steady state near the state within radius epsilon
-%   Detailed explanation goes here
-global gate_flow_coeff Q_base G_base G_min G_max;
 % pilot_max = gov_model.Pilot_max/gov_model.Pilot_base;
 % pilot_min = gov_model.Pilot_min/gov_model.Pilot_base;
-g_max = G_max/G_base;
-g_min = G_min/G_base;
+g_max = turb_model.G_max/turb_model.G_base;
+g_min = turb_model.G_min/turb_model.G_base;
 
 % H_turb_steady = (Q/(gate_flow_coeff*G))^2;
 H= -0.5;
@@ -18,9 +16,9 @@ while H<100 || H>300 || P_active<0 || P_active>700*10^6
 %%     saturate the servos
     near_state(5) = sat(near_state(5),gov_model.Pilot_min,gov_model.Pilot_max);
     near_state(3) = sat(near_state(3),g_min,g_max);
-    G = near_state(3)*G_base;
-    Q = near_state(2)*Q_base;
-    H=(Q/(gate_flow_coeff*G))^2;
+    G = near_state(3)*turb_model.G_base;
+    Q = near_state(2)*turb_model.Q_base;
+    H=(Q/(turb_model.gate_flow_coeff*G))^2;
     
     omega_m = near_state(1);
     psi_d = near_state(6);

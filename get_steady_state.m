@@ -1,5 +1,5 @@
 function [steady_state_1,steady_state_2,N_turb,e_r_1,e_r_2] =...
-    get_steady_state(gov_model,gen_model,P_active0,Q_reactive0)
+    get_steady_state(gov_model,gen_model,turb_model,P_active0,Q_reactive0)
 %get_steady_state computes power plant state
 %   ex
 global constant_governer;
@@ -14,7 +14,7 @@ omega_of_g = @(g)(gov_model.omega_ref - gov_model.K_f*g);
 if constant_governer
     omega_of_g = @(g)gov_model.omega_gov_ref;
 end
-[g0, q0]=turbineSteadyState(N_turb,omega_of_g);
+[g0, q0]=turb_model.steady(N_turb,omega_of_g);
 
 omega_m0 = omega_of_g(g0);
 omega_er0 = omega_m0*gen_model.poles_number;

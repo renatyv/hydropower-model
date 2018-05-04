@@ -1,4 +1,4 @@
-function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_model)
+function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_model,turb_model)
 %drawResults draws state variables over time
 
 global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
@@ -9,13 +9,13 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
 %% recover intermidiate values from state     
     omega_ms = state(:,1);
     omega_steady = steady_state_1(1);
-    omega_pus = omega_ms/omega_m_nom;
+    omega_pus = omega_ms/gen_model.omega_m_nom;
     qs = state(:,2);
     q_steady = steady_state_1(2);
     gs = state(:,3);
     g_steady = steady_state_1(3);
-    Qs = qs*Q_base;
-    Q_steady = q_steady*Q_base;
+    Qs = qs*turb_model.Q_base;
+    Q_steady = q_steady*turb_model.Q_base;
     pilot_servos = state(:,5);
     pilot_servo_steady = steady_state_1(5);
     % todo modify parsePsi to work with matrices)
@@ -50,11 +50,11 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     Turbine_powers = zeros(size(Qs));
     H_turbs = zeros(size(Qs));
     for k=1:length(Turbine_powers)
-        [ dq,Turbine_power,H_turb,H_loss] = turbineModel(t(k),gs(k),qs(k),omega_ms(k));
+        [ dq,Turbine_power,H_turb,H_loss] = turb_model.model(t(k),gs(k),qs(k),omega_ms(k));
         Turbine_powers(k) = Turbine_power;
         H_turbs(k) = H_turb;
     end
-    [ dq,Turbine_power_steady,H_turb_steady] = turbineModel(t(k),g_steady,q_steady,omega_steady);
+    [ dq,Turbine_power_steady,H_turb_steady] = turb_model.model(t(k),g_steady,q_steady,omega_steady);
 %     compute Q_i, n_i
 
 %% set frequency operating boundaries
@@ -64,10 +64,10 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
 %     omega_max2 = omega_m_nom*(1+0.4/50);
 %     omega_min2 = omega_m_nom*(1-0.4/50);
 %     disconnected from power network
-    omega_max1 = omega_m_nom*(1+1/50);
-    omega_min1 = omega_m_nom*(1-1/50);
-    omega_max2 = omega_m_nom*(1+5/50);
-    omega_min2 = omega_m_nom*(1-5/50);
+    omega_max1 = gen_model.omega_m_nom*(1+1/50);
+    omega_min1 = gen_model.omega_m_nom*(1-1/50);
+    omega_max2 = gen_model.omega_m_nom*(1+5/50);
+    omega_min2 = gen_model.omega_m_nom*(1-5/50);
 %% rotor frequecny VS. gate opening
     fig_2 = figure(2);
     g_min = min(gs);
@@ -120,15 +120,16 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     %% phase portrait on universal characteristic
     subplot(3,2,4);
     % % draw universal characteristic
+%% TODO get eta_Q_u,eta_n_u,eta_eta_u using function in turbine_model
     contour(7*eta_Q_u,eta_n_u,eta_eta_u,...
         [0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.84,0.88,0.90,0.91,0.92],'ShowText','On');
     % % draw trajectory
-    Q_is=1000*Qs./(d_runner^2*sqrt(H_turbs));
-    Q_i_steady = 1000*Q_steady./(d_runner^2*sqrt(H_turb_steady));
+    Q_is=1000*Qs./(turb_model.d_runner^2*sqrt(H_turbs));
+    Q_i_steady = 1000*Q_steady./(turb_model.d_runner^2*sqrt(H_turb_steady));
     ns=60*omega_ms/(2*pi);
     n_steady = 60*omega_steady/(2*pi);
-    n_is=ns*d_runner./sqrt(H_turbs);
-    n_i_steady = n_steady*d_runner./sqrt(H_turb_steady);
+    n_is=ns*turb_model.d_runner./sqrt(H_turbs);
+    n_i_steady = n_steady*turb_model.d_runner./sqrt(H_turb_steady);
     hold on;
     plot(Q_is,n_is,'b',Q_is(1),n_is(1),'b*',Q_i_steady,n_i_steady,'go');
     hold off;
