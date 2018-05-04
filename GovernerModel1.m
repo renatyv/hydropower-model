@@ -15,7 +15,14 @@ classdef GovernerModel1
         K_f = 0.7;
 %         K_dOmega must be small, otherwise unstable
         K_dOmega=0.0;
+        g_max = 1.0;
+        g_min = 0.0;
     end
+    
+    properties
+        constant_governer = false;
+    end
+    
     methods
         function [gov_state0] = steady(gov_params,g0)
             pilot_servo1 = g0;
@@ -23,7 +30,7 @@ classdef GovernerModel1
             gov_state0 = [PID_i1;pilot_servo1];
         end
         
-        function [dg,dgoverner_state] = model(gov_params,g,governer_state,omega_m,dOmega_m,enable_saturation,use_dead_zone)
+        function [dg,dgoverner_state] = model(this,g,governer_state,omega_m,dOmega_m,enable_saturation,use_dead_zone)
         %governerModel implements governer model
         %   enable_saturation=true enables servo motors saturation
         %   use_dead_zone=true enable input frequency dead zone
@@ -32,10 +39,8 @@ classdef GovernerModel1
         %   pilot_servo --- pilot servo state, p.u.
         %   omega_m --- rotor frequency, rad/s
         %   dOmega_m --- rotor frequency derivative rad/s^2
-        global constant_governer...
-            G_base G_max G_min;
 
-        if constant_governer
+        if this.constant_governer
             dg = 0;
             dPID_i = 0;
             dpilot_servo = 0;
@@ -43,33 +48,31 @@ classdef GovernerModel1
         else
             PID_i = governer_state(1);
             pilot_servo = governer_state(2);
-            omega_delta = gov_params.omega_ref-omega_m;
+            omega_delta = this.omega_ref-omega_m;
             if use_dead_zone
                 omega_delta = dead_zone(omega_delta,...
-                    -gov_params.omega_dead_zone/2,...
-                    gov_params.omega_dead_zone/2);
+                    -this.omega_dead_zone/2,...
+                    this.omega_dead_zone/2);
             end
             dOmega_deadzoned = dOmega_m;
-            if use_dead_zone && abs(omega_delta)<gov_params.omega_dead_zone/2
+            if use_dead_zone && abs(omega_delta)<this.omega_dead_zone/2
                 dOmega_deadzoned = 0;
             end
             PI_in = omega_delta...
-                +gov_params.K_dOmega*dOmega_deadzoned...
-                -gov_params.K_f*g;
+                +this.K_dOmega*dOmega_deadzoned...
+                -this.K_f*g;
 
             dPID_i = PI_in;
 
-            PID_out = gov_params.PID_Kp*PI_in...
-                +gov_params.PID_Ki*PID_i;
+            PID_out = this.PID_Kp*PI_in...
+                +this.PID_Ki*PID_i;
 
             pilot_in = PID_out;
-            pilot_max = gov_params.Pilot_max/gov_params.Pilot_base;
-            pilot_min = gov_params.Pilot_min/gov_params.Pilot_base;
+            pilot_max = this.Pilot_max/this.Pilot_base;
+            pilot_min = this.Pilot_min/this.Pilot_base;
 %             compute g_max,g_min in p.u.
-            g_max = G_max/G_base;
-            g_min = G_min/G_base;
-            [dpilot_servo] = servoModel(pilot_in,pilot_servo,pilot_min,pilot_max,gov_params.T_pilotservo,enable_saturation);
-            [dg] = servoModel(pilot_servo,g,g_min,g_max,gov_params.T_mainservo,enable_saturation);
+            [dpilot_servo] = servoModel(pilot_in,pilot_servo,pilot_min,pilot_max,this.T_pilotservo,enable_saturation);
+            [dg] = servoModel(pilot_servo,g,this.g_min,this.g_max,this.T_mainservo,enable_saturation);
             dgoverner_state = [dPID_i;dpilot_servo];
         end
         end

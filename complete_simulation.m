@@ -1,7 +1,6 @@
 clear variables;
 clear global;
-global constant_generator_torque...
-    constant_exciter constant_governer...
+global constant_exciter...
     P_active0 Q_reactive0...
     load_mode...
     exciter_PID_Ki exciter_PID_Kp;
@@ -9,6 +8,7 @@ global constant_generator_torque...
 %% % % configure simulation
 integration_stopper = false;
 enable_saturation = false;
+use_dead_zone = false;
 number_of_simulations = 1;
 t_max = 20.0;
 sim_maxstep = 0.01;
@@ -22,10 +22,6 @@ fprintf('exciter K_p=%.1f, K_i=%.1f\n',exciter_PID_Kp,exciter_PID_Ki);
 load_mode = 22;
 
 %% configuration
-constant_governer = false;
-use_dead_zone = false;
-
-constant_generator_torque = false;
 phi_1 = acos(0.9);
 P_active0 = 600*10^6;
 Q_reactive0 = P_active0/cos(phi_1)*sin(phi_1);
@@ -49,9 +45,10 @@ printState(steady_state_1,gen_model,turb_model);
 disp('steady state 2');
 printState(steady_state_2,gen_model,turb_model);
 
-%% for constant turbine power models set 
+%% initialize constant power models
 turb_model.constant_turbine_power = N_turb_steady;
 turb_model.constant_turbine_speed = steady_state_1(1);
+gen_model.constant_torque = -turb_model.constant_turbine_power/turb_model.constant_turbine_speed;
 
 %% compute jacobian and check local stability
 % assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');

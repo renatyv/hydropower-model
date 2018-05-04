@@ -41,11 +41,15 @@ classdef GenModel
         T_rq = GenModel.x_rq/(GenModel.omega_er_base*GenModel.r_rq);
     end
     
+    properties
+        use_constant_torque = false;
+        constant_torque = 0;
+    end
+    
     methods
         function [e_q,e_rq,e_rd,i_q,i_d] = psi_to_E(g,psi)
             %I_TO_PSI Solve flux-linkage equations
             %   Detailed explanation goes here
-%             global x_d x_q x_ad x_aq x_r x_rd x_rq;
             [psi_d,psi_q,psi_r,psi_rd,psi_rq] = parsePsi(psi);
             e_q = -(psi_d.*g.x_ad.^3 - psi_r.*g.x_ad.^2.*g.x_r - psi_d.*g.x_ad.^2.*g.x_rd + psi_rd.*g.x_ad.^2.*g.x_rd - psi_rd.*g.x_ad.*g.x_d.*g.x_rd + psi_r.*g.x_d.*g.x_r.*g.x_rd)/...
                 (g.x_ad.^2.*g.x_d + g.x_ad.^2.*g.x_r + g.x_ad.^2.*g.x_rd - 2.*g.x_ad.^3 - g.x_d.*g.x_r.*g.x_rd);
@@ -112,8 +116,6 @@ classdef GenModel
             model(g,psi,v_d,v_q,e_r,omega_m)
             %generatorModel synchronuous generator equations from Merkuriev
             %   Detailed explanation goes here
-            global  constant_generator_torque...
-                    N_turb_const omega_m_const;
             assert(length(psi)==5,'psi is wrong, %d',length(psi));
             assert(~isempty(v_d),'v_d is wrong, %d',v_d);
             assert(~isempty(v_q),'v_q is wrong, %d',v_q);
@@ -121,14 +123,9 @@ classdef GenModel
             assert(~isempty(omega_m),'omega_er is wrong, %d',omega_m);
             omega_er = omega_m*g.poles_number;
         %% Vector of derivatives
-            if constant_generator_torque
+            if g.use_constant_torque
                 dpsi = zeros(5,1);
-        %         dPsi_d = 0;
-        %         dPsi_q = 0;
-        %         dPsi_r = 0;
-        %         dPsi_rd = 0;
-        %         dPsi_rq = 0;
-                electric_torque = -N_turb_const/omega_m_const;
+                electric_torque = g.constant_torque;
             else
                 %% Flux linkage equations
                 [psi_d,psi_q,~,~,~] = parsePsi(psi);
