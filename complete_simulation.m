@@ -1,20 +1,10 @@
 clear variables;
 clear global;
-global use_simple_gateflow_model use_constant_turbine_efficiency...
-    simulate_vortex_rope_oscillations...
-    omega_m_nom...
-    PID_Kp PID_Ki K_dOmega...
-    turbine_const_efficiency...
-    complete_inertia runner_inertia rotor_inertia...
-    constant_turbine_torque constant_generator_torque...
-    z_tailrace_const z_forebay...
+global constant_generator_torque...
     constant_exciter constant_governer...
     P_active0 Q_reactive0...
     load_mode...
-    exciter_PID_Ki exciter_PID_Kp...
-    Power_max...
-    N_turb_const omega_m_const T_m;
-
+    exciter_PID_Ki exciter_PID_Kp;
 
 %% % % configure simulation
 integration_stopper = false;
@@ -32,7 +22,6 @@ fprintf('exciter K_p=%.1f, K_i=%.1f\n',exciter_PID_Kp,exciter_PID_Ki);
 load_mode = 22;
 
 %% configuration
-constant_turbine_torque = false;
 constant_governer = false;
 use_dead_zone = false;
 
@@ -43,21 +32,10 @@ Q_reactive0 = P_active0/cos(phi_1)*sin(phi_1);
 % N_gen = -300*10^6; %W, generator power
 constant_exciter = false;
 
-use_simple_gateflow_model = false;
-use_constant_turbine_efficiency = false;
-turbine_const_efficiency = 0.8;
-simulate_vortex_rope_oscillations = false;
 plot_results = true;
 
-
-% %% initialize parameters
-% rpm_nom = 142.8; % revolutions per minute nomial frequency
-% omega_m_nom = rpm_nom/60*2*pi; %(rad/s), mechanical frequency of the rotor
-
 %% models parameters
-% generatorParameters;
 gen_model = GenModel();
-% turbineParameters;
 turb_model = TurbineModel1();
 % T_m =complete_inertia*omega_m_nom^2/Power_max;
 gov_model = GovernerModel1();
@@ -127,7 +105,6 @@ function [dstate] = full_model(t,state,e_r_const,enable_saturation,use_dead_zone
     
     [ dpsi,Electric_torque] =...
             gen_model.model(psi,v_d,v_q,e_r,omega_m);
-%         TODO add turbine inertia
     complete_inertia = gen_model.rotor_inertia+turb_model.runner_inertia;
     domega_m = (Turbine_torque+Electric_torque)/complete_inertia;
     [dg,dgoverner_state] =...
