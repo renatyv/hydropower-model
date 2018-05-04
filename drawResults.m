@@ -1,10 +1,6 @@
 function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_model,turb_model)
 %drawResults draws state variables over time
 
-global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
-    omega_er_base S_base torque_base...
-    r_s T_r z_tailrace_const eta_Q_u eta_n_u eta_eta_u;
-
     set(groot,'defaultLineLineWidth',2);
 %% recover intermidiate values from state     
     omega_ms = state(:,1);
@@ -121,7 +117,8 @@ global Q_base G_base omega_m_nom poles_number gate_flow_coeff d_runner...
     subplot(3,2,4);
     % % draw universal characteristic
 %% TODO get eta_Q_u,eta_n_u,eta_eta_u using function in turbine_model
-    contour(7*eta_Q_u,eta_n_u,eta_eta_u,...
+    [eta_Q_u,eta_n_u,eta_eta_u] = TurbineModel1.getCharacteristic();
+    contour(eta_Q_u/TurbineModel1.Qi_coeff,eta_n_u,eta_eta_u,...
         [0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.84,0.88,0.90,0.91,0.92],'ShowText','On');
     % % draw trajectory
     Q_is=1000*Qs./(turb_model.d_runner^2*sqrt(H_turbs));
