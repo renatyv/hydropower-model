@@ -3,7 +3,6 @@ classdef GovernerModel1
         omega_m_nom = 14.954;
         omega_ref = GovernerModel1.omega_m_nom+0.35;
         omega_dead_zone = 5*GovernerModel1.omega_m_nom*10^-5;
-        omega_gov_ref = GovernerModel1.omega_m_nom+0.35;
         Pilot_max = 120;
         Pilot_min = 0;
         Pilot_base = GovernerModel1.Pilot_max;

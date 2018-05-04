@@ -95,7 +95,7 @@ classdef TurbineModel1
     properties
         %% configuration
         use_constant_turbine_torque = false;
-        constant_turbine_power = 200*10^6;
+        constant_turbine_power = 0;
         constant_turbine_speed = TurbineModel1.omega_m_nom;
         use_simple_gateflow_model = true;
         use_constant_turbine_efficiency = true;

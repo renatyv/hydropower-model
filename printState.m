@@ -1,6 +1,5 @@
-function [] = printState(state,gen_model,turb_model)
+function [] = printState(t,state,gen_model,turb_model,load_model)
 %printState prints state to consolse in a pretty way
-global omega_m_nom G_base Q_base S_base; 
 fprintf('(');
 fprintf('%.2f,',state(1:end-1));
 fprintf('%.2f)\n',state(end));
@@ -15,9 +14,12 @@ ps = state(5);
 % psi_r = state(8);
 % psi_rd = state(9);
 % psi_rq = state(10);
+Q_base = turb_model.Q_base;
+G_base = turb_model.G_base;
+S_base = gen_model.S_base;
 
 [E_q,E_rq,E_rd,i_q,i_d] = gen_model.psi_to_E(psi);
-[v_d,v_q] = loadModel(0,i_d,i_q,omega_m,gen_model.S_base,gen_model.omega_m_nom);
+[v_d,v_q] = load_model.model(t,i_d,i_q,omega_m,gen_model.omega_m_nom,gen_model.S_base);
 [dq,Turbine_power,H_turb,H_loss] = turb_model.model(0,g,q,omega_m);
 fprintf('omega_m=%.1f(rad/s) Q=%.0f(m^3/s) G=%.0f(mm) H_t=%.0f(m) H_{loss}=%.1f(m) PID_i=%.2f ps=%.1f\n',...
     omega_m,q*Q_base,g*G_base,H_turb,H_loss,...
