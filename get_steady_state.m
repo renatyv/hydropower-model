@@ -15,9 +15,9 @@ N_turb = -N_gen;
 omega_ref = gov_model.omega_ref;
 K_f = gov_model.K_f;
 omega_of_g = @(g)(omega_ref - K_f*g);
-if gov_model.constant_governer
-    omega_of_g = @(g)omega_ref;
-end
+% if gov_model.constant_governer
+%     omega_of_g = @(g)omega_ref;
+% end
 [g0, q0]=turb_model.steady(N_turb,omega_of_g);
 
 omega_m0 = omega_of_g(g0);

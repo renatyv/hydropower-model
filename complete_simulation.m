@@ -1,7 +1,7 @@
 clear variables;
 
 %% % % configure simulation
-integration_stopper = false;
+integration_stopper = true;
 enable_saturation = false;
 use_dead_zone = false;
 number_of_simulations = 1;
@@ -17,6 +17,8 @@ gen_model = GenModel();
 turb_model = TurbineModel1();
 exciter_model = ExciterPIModel();
 gov_model = GovernerModel1();
+% gov_model = GovernerModelSSHG();
+% gov_model = ConstantGoverner();
 load_model = LoadModelPQ();
 % T_m =complete_inertia*omega_m_nom^2/Power_max;
 % % % initial frequency in radian/s, electrical radian/s, HZ and rpm
