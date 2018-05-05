@@ -1,37 +1,29 @@
 function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_model,turb_model)
 %drawResults draws state variables over time
 
+%% set linewidth for all plots 
     set(groot,'defaultLineLineWidth',2);
-%% recover intermidiate values from state     
-    omega_ms = state(:,1);
-    omega_steady = steady_state_1(1);
+    
+%% recover intermidiate values from state
+        for k=1:length(state(:,1))
+        state_k = state(k,:);
+        [omega_ms(k,:),qs(k,:),gs(k,:),governer_states(k,:),psis(k,:),exciter_states(k,:)] = parseState(state_k);
+    end
+    [omega_steady,q_steady,g_steady,governer_steady,psis_steady,exciter_steady] = parseState(steady_state_1);
+    
     omega_pus = omega_ms/gen_model.omega_m_nom;
-    qs = state(:,2);
-    q_steady = steady_state_1(2);
-    gs = state(:,3);
-    g_steady = steady_state_1(3);
     Qs = qs*turb_model.Q_base;
     Q_steady = q_steady*turb_model.Q_base;
-    pilot_servos = state(:,5);
-    pilot_servo_steady = steady_state_1(5);
-    % todo modify parsePsi to work with matrices)
-    psis = state(:,6:10);
     e_qs = zeros(size(omega_ms));
     e_rqs = zeros(size(omega_ms));
     e_rds = zeros(size(omega_ms));
     i_qs = zeros(size(omega_ms));
     i_ds = zeros(size(omega_ms));
-%%  compute stator and exciter voltages
+%%  compute stator and exciter voltages using known generaotr model and psi (not using load and exciter models)
     for k=1:length(omega_ms)
         psi = psis(k,:);
-        [e_q,e_rq,e_rd,i_q,i_d] = gen_model.psi_to_E(psi);
-        e_qs(k) = e_q;
-        e_rqs(k) = e_rq;
-        e_rds(k) = e_rd;
-        i_qs(k) = i_q;
-        i_ds(k) = i_d;
+        [e_qs(k),e_rqs(k),e_rds(k),i_qs(k),i_ds(k)] = gen_model.psi_to_E(psi);
     end
-    %TODO use parsePsi instead
 	psi_ds = psis(:,1);
     psi_qs = psis(:,2);
     psi_rs = psis(:,3);
@@ -42,15 +34,13 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_m
     dPsi_rs = estimateDerivative(psi_rs,t);
     e_rs=(dPsi_rs*gen_model.T_r+e_qs);
     
-%%     compute turbine power
+%%     compute turbine power and head
     Turbine_powers = zeros(size(Qs));
     H_turbs = zeros(size(Qs));
     for k=1:length(Turbine_powers)
-        [ dq,Turbine_power,H_turb,H_loss] = turb_model.model(t(k),gs(k),qs(k),omega_ms(k));
-        Turbine_powers(k) = Turbine_power;
-        H_turbs(k) = H_turb;
+        [ ~,Turbine_powers(k),H_turbs(k),~] = turb_model.model(t(k),gs(k),qs(k),omega_ms(k));
     end
-    [ dq,Turbine_power_steady,H_turb_steady] = turb_model.model(t(k),g_steady,q_steady,omega_steady);
+    [ ~,~,H_turb_steady] = turb_model.model(t(k),g_steady,q_steady,omega_steady);
 %     compute Q_i, n_i
 
 %% set frequency operating boundaries
@@ -116,7 +106,6 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_m
     %% phase portrait on universal characteristic
     subplot(3,2,4);
     % % draw universal characteristic
-%% TODO get eta_Q_u,eta_n_u,eta_eta_u using function in turbine_model
     [eta_Q_u,eta_n_u,eta_eta_u] = TurbineModel1.getCharacteristic();
     contour(eta_Q_u/TurbineModel1.Qi_coeff,eta_n_u,eta_eta_u,...
         [0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.84,0.88,0.90,0.91,0.92],'ShowText','On');
@@ -134,21 +123,19 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_m
     xlabel('Q_i');
     ylabel('n_i');
 
-    %% hydraulic + governer
+    %% turbin variables
     subplot(3,2,3);
     H_base = 200;
     p1 = plot(t,gs,'b',...
-    t,pilot_servos,'g',...
     t,qs,'r',...
     t,H_turbs/H_base,'k');
     xlabel('t');
     ylabel('p.u.');
     hold on;
     plot([t(1);t(end)],[g_steady;g_steady],'b--',...
-    [t(1);t(end)],[pilot_servo_steady;pilot_servo_steady],'g--',...
     [t(1);t(end)],[q_steady;q_steady],'r--',...
     [t(1);t(end)],[H_turb_steady/H_base;H_turb_steady/H_base],'k--');
-    legend([p1],'g','pilot','q','h_{turb}','Location','northeastoutside');
+    legend([p1],'g','q','h_{turb}','Location','northeastoutside');
     hold off;
 
     %% stator voltages and currents
@@ -163,4 +150,3 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_m
     legend('sqrt(v_d^2+v_q^2)','e_r');
     xlabel('t');
 end
-
