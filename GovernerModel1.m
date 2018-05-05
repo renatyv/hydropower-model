@@ -16,6 +16,7 @@ classdef GovernerModel1
         K_dOmega=0.0;
         g_max = 1.0;
         g_min = 0.0;
+        state_size = 2;
     end
     
     properties

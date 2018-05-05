@@ -25,9 +25,9 @@ load_model = LoadModelPQ();
 [steady_state_1,steady_state_2,N_turb_steady,e_r_1,e_r_2] =...
     get_steady_state(gov_model,gen_model,turb_model,exciter_model,load_model);
 disp('steady state 1');
-printState(0,steady_state_1,gen_model,turb_model,load_model);
+printState(0,steady_state_1,gen_model,turb_model,load_model,gov_model);
 disp('steady state 2');
-printState(0,steady_state_2,gen_model,turb_model,load_model);
+printState(0,steady_state_2,gen_model,turb_model,load_model,gov_model);
 
 %% initialize constant power models
 turb_model.constant_turbine_power = N_turb_steady;
@@ -55,7 +55,7 @@ for k=1:number_of_simulations
     initial_state = generate_state_near(gov_model,gen_model,turb_model,load_model,steady_state_1,max_distance);
 %     initial_state=steady_state_1;
     fprintf('initial state for simulation %d\n',k);
-    printState(0,initial_state,gen_model,turb_model,load_model);
+    printState(0,initial_state,gen_model,turb_model,load_model,gov_model);
     options = odeset('MaxStep',sim_maxstep);
     if integration_stopper
         options = odeset('MaxStep',sim_maxstep,'Events',@stop_integration_event);
@@ -63,7 +63,7 @@ for k=1:number_of_simulations
 %     options = odeset('MaxStep',sim_maxstep);
     [t, state] = ode15s(sim_model_1, time, initial_state,options);
     [fig_1,fig_2] =...
-        drawResults(t,state,steady_state_1,steady_state_2,gen_model,turb_model);
+        drawResults(t,state,steady_state_1,steady_state_2,gen_model,turb_model,gov_model);
     % save sim results to files
     file_name = sprintf('%.0fMW_load%d',load_model.P_active0/10^6,k);
     saveas(fig_1,sprintf('sim_results/all_%s.png',file_name));
@@ -75,7 +75,7 @@ end
 
 %% complete model 
 function [dstate] = full_model(t,state,enable_saturation,use_dead_zone,gov_model,gen_model,turb_model,exciter_model,load_model)
-    [omega_m,q,g,governer_state,psi,exciter_state] = parseState(state);
+    [omega_m,q,g,governer_state,psi,exciter_state] = parseState(state,gov_model.state_size);
     
     [ dq,Turbine_power,~,~] = turb_model.model(t,g,q,omega_m);
     Turbine_torque = Turbine_power/omega_m;
