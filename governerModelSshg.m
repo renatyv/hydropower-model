@@ -10,9 +10,9 @@ classdef GovernerModelSSHG
         T_pilotservo = GovernerModelSSHG.T_mainservo*1.3;
         T_driveservo = GovernerModelSSHG.T_pilotservo;
         
-        PID_Kp=30;
-        PID_Ki=2;
-        K_f = 0.7;
+        PID_Kp=35;
+        PID_Ki=25;
+        K_f = 1.0;
         K_dOmega=0.0;
         g_max = 1.0;
         g_min = 0.0;
