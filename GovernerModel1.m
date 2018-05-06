@@ -20,6 +20,10 @@ classdef GovernerModel1
     end
     
     methods
+        function [omega_m] = steady_freq(this,g)
+            omega_m = this.omega_ref - this.K_f*g;
+        end
+        
         function [gov_state0] = steady(this,g0)
             pilot_servo1 = g0;
             PID_i1 = g0/this.PID_Ki;
