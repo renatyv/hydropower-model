@@ -32,6 +32,7 @@ disp('steady state 2');
 printState(0,steady_state_2,gen_model,turb_model,load_model,gov_model);
 
 %% initialize constant power models
+%% TODO implement class ConstantTorqueTurbineModel isntead
 turb_model.constant_turbine_power = N_turb_steady;
 turb_model.constant_turbine_speed = steady_state_1(1);
 gen_model.constant_torque = -turb_model.constant_turbine_power/turb_model.constant_turbine_speed;

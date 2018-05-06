@@ -101,7 +101,6 @@ classdef GenModel
                 assert(abs(e_rd1-e_rd)<test_eps,'wrong E_rd');
                 assert(abs(i_q1-i_q)<test_eps,'wrong i_q');
                 assert(abs(i_d1-i_d)<test_eps,'wrong i_d');
-
             end
             [psi_1,e_r_1] = compute_state(theta_er1);
             [psi_2,e_r_2] = compute_state(theta_er2);
