@@ -39,20 +39,19 @@ gen_model.constant_torque = -turb_model.constant_turbine_power/turb_model.consta
 
 %% compute jacobian and check local stability
 % assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
-model = @(t,state,e_r_const,enable_saturation,use_dead_zone)...
+model = @(t,state,enable_saturation,use_dead_zone)...
     full_model(t,state,enable_saturation,use_dead_zone,gov_model,gen_model,turb_model,exciter_model,load_model);
 
-aut_model_nosat_nodz_ss1 =@(s)(model(0,s,e_r_1,false,false));
-Jac1 = NumJacob(aut_model_nosat_nodz_ss1,steady_state_1');
-assert(max(abs(aut_model_nosat_nodz_ss1(steady_state_1)))<10^-3,'state 1 is not steady');
+aut_model_nosat_nodz =@(s)(model(0,s,false,false));
+Jac1 = NumJacob(aut_model_nosat_nodz,steady_state_1');
+assert(max(abs(aut_model_nosat_nodz(steady_state_1)))<10^-3,'state 1 is not steady');
 
-aut_model_nosat_nodz_ss2 =@(s)(model(0,s,e_r_2,false,false));
-Jac2 = NumJacob(aut_model_nosat_nodz_ss2,steady_state_2');
-assert(max(abs(aut_model_nosat_nodz_ss2(steady_state_2)))<10^-3,'state 2 is not steady');
+Jac2 = NumJacob(aut_model_nosat_nodz,steady_state_2');
+assert(max(abs(aut_model_nosat_nodz(steady_state_2)))<10^-3,'state 2 is not steady');
 % disp([eig(Jac1),eig(Jac2)]);
 %% simulation
 time = [0, t_max];
-sim_model_1 = @(t,state)(model(t,state,e_r_1,enable_saturation,use_dead_zone));
+sim_model_1 = @(t,state)(model(t,state,enable_saturation,use_dead_zone));
 for k=1:number_of_simulations
     max_distance = 0.05;
     initial_state = generate_state_near(gov_model,gen_model,turb_model,load_model,steady_state_1,max_distance);
