@@ -12,12 +12,9 @@ N_gen = -((i_ampl^2)*r_s*S_base+P0);
 N_turb = -N_gen;
 
 %% turbine and vogerner steady state
-omega_ref = gov_model.omega_ref;
-K_f = gov_model.K_f;
-omega_of_g = @(g)(omega_ref - K_f*g);
-[g0, q0]=turb_model.steady(N_turb,omega_of_g);
+[g0, q0]=turb_model.steady(N_turb,@gov_model.steady_freq);
 
-omega_m0 = omega_of_g(g0);
+omega_m0 = gov_model.steady_freq(g0);
 omega_er0 = omega_m0*gen_model.poles_number;
 
 %% governer steady state

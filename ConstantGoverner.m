@@ -6,6 +6,11 @@ classdef ConstantGoverner
     end
     methods
         
+        function [omega_m] = steady_freq(this,g)
+%             any frequency is steady
+            omega_m = this.omega_ref - this.K_f*g;
+        end
+        
         function [gov_state0] = steady(this,g0)
             gov_state0 = [];
         end
