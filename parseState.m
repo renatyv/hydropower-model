@@ -1,7 +1,7 @@
-function [omega_m,q,g,governer_state,psi,exciter_state] = parseState(state,gov_size)
+function [omega_pu,q,g,governer_state,psi,exciter_state] = parseState(state,gov_size)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
-omega_m = state(1);
+omega_pu = state(1);
 q = state(2);
 g = state(3);
 state_size = 3;

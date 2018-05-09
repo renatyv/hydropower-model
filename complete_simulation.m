@@ -43,6 +43,8 @@ model = @(t,state,enable_saturation,use_dead_zone)...
     full_model(t,state,enable_saturation,use_dead_zone,gov_model,gen_model,turb_model,exciter_model,load_model);
 
 aut_model_nosat_nodz =@(s)(model(0,s,false,false));
+minimodel = @(x)(aut_model_nosat_nodz(x)'*aut_model_nosat_nodz(x)); 
+
 Jac1 = NumJacob(aut_model_nosat_nodz,steady_state_1');
 assert(max(abs(aut_model_nosat_nodz(steady_state_1)))<10^-3,'state 1 is not steady');
 
@@ -77,8 +79,9 @@ end
 
 %% complete model 
 function [dstate] = full_model(t,state,enable_saturation,use_dead_zone,gov_model,gen_model,turb_model,exciter_model,load_model)
-    [omega_m,q,g,governer_state,psi,exciter_state] = parseState(state,gov_model.state_size);
-    
+    [omega_pu,q,g,governer_state,psi,exciter_state] = parseState(state,gov_model.state_size);
+    omega_m = omega_pu*gen_model.omega_m_nom;
+
     [ dq,Turbine_power,~,~] = turb_model.model(t,g,q,omega_m);
     Turbine_torque = Turbine_power/omega_m;
 

@@ -3,7 +3,8 @@ function [] = printState(t,state,gen_model,turb_model,load_model,gov_model)
 fprintf('(');
 fprintf('%.2f,',state(1:end-1));
 fprintf('%.2f)\n',state(end));
-[omega_m,q,g,governer_state,psi,exciter_state] = parseState(state,gov_model.state_size);
+[omega_pu,q,g,governer_state,psi,exciter_state] = parseState(state,gov_model.state_size);
+omega_m = omega_pu*gen_model.omega_m_nom;
 Q_base = turb_model.Q_base;
 G_base = turb_model.G_base;
 S_base = gen_model.S_base;
