@@ -32,4 +32,3 @@ exciter_state_2  = exciter_model.steady(e_r_2);
 steady_state_1 = constructState(omega_m0,q0,g0,gov_state0,psi_1,exciter_state_1);
 steady_state_2 = constructState(omega_m0,q0,g0,gov_state0,psi_2,exciter_state_2);
 end
-
