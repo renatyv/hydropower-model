@@ -1,4 +1,4 @@
-function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_model,turb_model,gov_model)
+function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_model,turb_model,gov_model,exciter_model)
 %drawResults draws state variables over time
 
 %% set linewidth for all plots 
@@ -7,10 +7,10 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_m
 %% recover intermidiate values from state
         for k=1:length(state(:,1))
         state_k = state(k,:);
-        [omega_pu,qs(k,:),gs(k,:),governer_states(k,:),psis(k,:),exciter_states(k,:)] = parseState(state_k,gov_model.state_size);
+        [omega_pu,qs(k,:),gs(k,:),governer_states(k,:),psis(k,:),exciter_states(k,:)] = parseState(state_k,gov_model.state_size,exciter_model.state_size);
         omega_ms(k,:) = omega_pu*gen_model.omega_m_nom;
     end
-    [omega_steady_pu,q_steady,g_steady,governer_steady,psis_steady,exciter_steady] = parseState(steady_state_1,gov_model.state_size);
+    [omega_steady_pu,q_steady,g_steady,governer_steady,psis_steady,exciter_steady] = parseState(steady_state_1,gov_model.state_size,exciter_model.state_size);
     omega_steady = omega_steady_pu*gen_model.omega_m_nom;
     
     omega_pus = omega_ms/gen_model.omega_m_nom;

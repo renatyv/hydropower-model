@@ -48,8 +48,9 @@ aut_model_nosat_nodz =@(s)(model(0,s,false,false));
 assert(max(abs(aut_model_nosat_nodz(steady_state_1)))<10^-3,'state 1 is not steady');
 Jac1 = NumJacob(aut_model_nosat_nodz,steady_state_1');
 
-assert(max(abs(aut_model_nosat_nodz(steady_state_2)))<10^-3,'state 2 is not steady');
-Jac2 = NumJacob(aut_model_nosat_nodz,steady_state_2');
+% exciter has only one steady state
+% assert(max(abs(aut_model_nosat_nodz(steady_state_2)))<10^-3,'state 2 is not steady');
+% Jac2 = NumJacob(aut_model_nosat_nodz,steady_state_2');
 % disp([eig(Jac1),eig(Jac2)]);
 %% simulation
 time = [0, t_max];
@@ -59,7 +60,7 @@ for k=1:number_of_simulations
     initial_state = generate_state_near(gov_model,gen_model,turb_model,load_model,steady_state_1,max_distance);
 %     initial_state=steady_state_1;
     fprintf('initial state for simulation %d\n',k);
-    printState(0,initial_state,gen_model,turb_model,load_model,gov_model);
+    printState(0,initial_state,gen_model,turb_model,load_model,gov_model,exciter_model);
     options = odeset('MaxStep',sim_maxstep);
     if integration_stopper
         options = odeset('MaxStep',sim_maxstep,'Events',@stop_integration_event);
@@ -67,7 +68,7 @@ for k=1:number_of_simulations
 %     options = odeset('MaxStep',sim_maxstep);
     [t, state] = ode15s(sim_model_1, time, initial_state,options);
     [fig_1,fig_2] =...
-        drawResults(t,state,steady_state_1,steady_state_2,gen_model,turb_model,gov_model);
+        drawResults(t,state,steady_state_1,steady_state_2,gen_model,turb_model,gov_model,exciter_model);
     % save sim results to files
     file_name = sprintf('%.0fMW_load%d',load_model.P_active0/10^6,k);
     saveas(fig_1,sprintf('sim_results/all_%s.png',file_name));
