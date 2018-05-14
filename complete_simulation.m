@@ -15,7 +15,7 @@ plot_results = true;
 %% models parameters
 gen_model = GenModel();
 turb_model = TurbineModel1();
-exciter_model = ExciterPIModel();
+exciter_model = ExciterModelAC4A();
 gov_model = GovernerModel1();
 % gov_model = GovernerModelSSHG();
 % gov_model = ConstantGoverner();
@@ -24,12 +24,12 @@ load_model = LoadModelPQ();
 % % % initial frequency in radian/s, electrical radian/s, HZ and rpm
 
 %% compute and print initial state
-[steady_state_1,steady_state_2,N_turb_steady,e_r_1,e_r_2] =...
+[steady_state_1,steady_state_2,N_turb_steady] =...
     get_steady_state(gov_model,gen_model,turb_model,exciter_model,load_model);
 disp('steady state 1');
-printState(0,steady_state_1,gen_model,turb_model,load_model,gov_model);
+printState(0,steady_state_1,gen_model,turb_model,load_model,gov_model,exciter_model);
 disp('steady state 2');
-printState(0,steady_state_2,gen_model,turb_model,load_model,gov_model);
+printState(0,steady_state_2,gen_model,turb_model,load_model,gov_model,exciter_model);
 
 %% initialize constant power models
 %% TODO implement class ConstantTorqueTurbineModel isntead
@@ -43,13 +43,13 @@ model = @(t,state,enable_saturation,use_dead_zone)...
     full_model(t,state,enable_saturation,use_dead_zone,gov_model,gen_model,turb_model,exciter_model,load_model);
 
 aut_model_nosat_nodz =@(s)(model(0,s,false,false));
-minimodel = @(x)(aut_model_nosat_nodz(x)'*aut_model_nosat_nodz(x)); 
+% minimodel = @(x)(aut_model_nosat_nodz(x)'*aut_model_nosat_nodz(x)); 
 
-Jac1 = NumJacob(aut_model_nosat_nodz,steady_state_1');
 assert(max(abs(aut_model_nosat_nodz(steady_state_1)))<10^-3,'state 1 is not steady');
+Jac1 = NumJacob(aut_model_nosat_nodz,steady_state_1');
 
-Jac2 = NumJacob(aut_model_nosat_nodz,steady_state_2');
 assert(max(abs(aut_model_nosat_nodz(steady_state_2)))<10^-3,'state 2 is not steady');
+Jac2 = NumJacob(aut_model_nosat_nodz,steady_state_2');
 % disp([eig(Jac1),eig(Jac2)]);
 %% simulation
 time = [0, t_max];
@@ -79,7 +79,7 @@ end
 
 %% complete model 
 function [dstate] = full_model(t,state,enable_saturation,use_dead_zone,gov_model,gen_model,turb_model,exciter_model,load_model)
-    [omega_pu,q,g,governer_state,psi,exciter_state] = parseState(state,gov_model.state_size);
+    [omega_pu,q,g,governer_state,psi,exciter_state] = parseState(state,gov_model.state_size,exciter_model.state_size);
     omega_m = omega_pu*gen_model.omega_m_nom;
 
     [ dq,Turbine_power,~,~] = turb_model.model(t,g,q,omega_m);

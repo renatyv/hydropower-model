@@ -2,6 +2,7 @@ classdef ExciterPIModel
     properties(Constant)
         exciter_PID_Ki=2;
         exciter_PID_Kp=10;
+        state_size = 1;
     end
     properties
         use_constant_exciter=false;

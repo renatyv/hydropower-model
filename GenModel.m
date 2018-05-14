@@ -62,16 +62,16 @@ classdef GenModel
         end
         
         function [psi_1,e_r_1, psi_2,e_r_2] =...
-            steady(g,i0, phi_1,omega_er0)
+            steady(g,i_ampl,v_ampl, phi_1,omega_er0)
             %generatorSteadyStateDan computes steady state of the generator
             %   i0 --- current amplitude,
             %   phi_1 --- power coefficient, 
             %   omega_er0 --- rotor frequency
             %% compute steady state corresponding to initial load
-            v_df = @(theta)(cos(theta));
-            v_qf = @(theta)(-sin(theta));
-            i_df = @(theta)(i0*cos(theta+phi_1));
-            i_qf = @(theta)(-i0*sin(theta+phi_1));
+            v_df = @(theta)(v_ampl*cos(theta));
+            v_qf = @(theta)(-v_ampl*sin(theta));
+            i_df = @(theta)(i_ampl*cos(theta+phi_1));
+            i_qf = @(theta)(-i_ampl*sin(theta+phi_1));
             omega_pu0 = omega_er0/g.omega_er_base;
             % % function is 2pi-periodic, there are two zeros
             theta_f = @(theta_er)(omega_pu0*g.x_q*i_qf(theta_er)+i_df(theta_er)*g.r_s+v_df(theta_er));
