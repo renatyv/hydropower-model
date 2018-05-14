@@ -28,7 +28,8 @@ function [error,steady_state_1,steady_state_2,e_r_1] = s_state(v_ampl)
     %% exciter steady state
     exciter_state_1  = exciter_model.steady(e_r_1);
     exciter_state_2  = exciter_model.steady(e_r_2);
-	error = min(abs(exciter_model.steadyE_r(v_ampl)-e_r_1),abs(exciter_model.steadyE_r(v_ampl)-e_r_2));
+    error = min(abs(exciter_model.steadyV_ampl(e_r_1)-v_ampl),abs(exciter_model.steadyV_ampl(e_r_2)-v_ampl));
+% 	error = min(abs(exciter_model.steadyE_r(v_ampl)-e_r_1),abs(exciter_model.steadyE_r(v_ampl)-e_r_2));
 
     %% complete steady state
     steady_state_1 = constructState(omega_m0,q0,g0,gov_state0,psi_1,exciter_state_1);

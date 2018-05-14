@@ -15,7 +15,8 @@ plot_results = true;
 %% models parameters
 gen_model = GenModel();
 turb_model = TurbineModel1();
-exciter_model = ExciterModelAC4A();
+% exciter_model = ExciterModelAC4A();
+exciter_model = ExciterPIModel();
 gov_model = GovernerModel1();
 % gov_model = GovernerModelSSHG();
 % gov_model = ConstantGoverner();
