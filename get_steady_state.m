@@ -39,8 +39,8 @@ end
 function error = error_func(v_ampl)
     [error,~,~,~] = s_state(v_ampl);
 end
-options = optimset('MaxIter',1000,'TolFun',1e-12);
-v_ampl = fminsearch(@(v)error_func(v),1.0,options)
+options = optimset('MaxIter',2000,'TolFun',1e-15,'TolX',1e-15);
+v_ampl = fminsearch(@(v)error_func(v),1.0,options);
 % v_ampls = (0.9:10^-5:1.1);
 % errors = -ones(size(v_ampls));
 % for k=1:length(v_ampls)
@@ -48,5 +48,5 @@ v_ampl = fminsearch(@(v)error_func(v),1.0,options)
 % end
 % [min_error,index]=min(errors)
 % v_ampl = v_ampls(index)
-[~,steady_state_1,steady_state_2,e_r_1] = s_state(v_ampl)
+[~,steady_state_1,steady_state_2,e_r_1] = s_state(v_ampl);
 end

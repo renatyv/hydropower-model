@@ -175,7 +175,8 @@ classdef TurbineModel1
                 [ dqq,Turbine_power,~,~] = this.model(0,g,q,omega_of_g(g));
                 dq = dqq.^2+(N_turb/S_base-Turbine_power/S_base)^2;
             end
-            x=fminsearch(@turb_model,[0.1,0.1]);
+            options = optimset('MaxIter',2000,'TolFun',1e-15,'TolX',1e-15);
+            x=fminsearch(@turb_model,[0.5,0.5],options);
             q0=x(1);
             g0=x(2);
         end

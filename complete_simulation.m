@@ -17,10 +17,13 @@ gen_model = GenModel();
 turb_model = TurbineModel1();
 % exciter_model = ExciterModelAC4A();
 exciter_model = ExciterPIModel();
-gov_model = GovernerModel1();
+% gov_model = GovernerModel1();
 % gov_model = GovernerModelSSHG();
-% gov_model = ConstantGoverner();
-load_model = LoadModelPQ();
+gov_model = ConstantGoverner();
+% initial active power and coefficient
+P_active = 300*10^6;
+phi = acos(0.9);
+load_model = LoadModelPQ(P_active,phi);
 % T_m =complete_inertia*omega_m_nom^2/Power_max;
 % % % initial frequency in radian/s, electrical radian/s, HZ and rpm
 
@@ -41,25 +44,27 @@ gen_model.constant_torque = -turb_model.constant_turbine_power/turb_model.consta
 %% compute jacobian and check local stability
 % assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
 model = @(t,state,enable_saturation,use_dead_zone)...
-    full_model(t,state,enable_saturation,use_dead_zone,gov_model,gen_model,turb_model,exciter_model,load_model);
+    full_model(t,state,enable_saturation,use_dead_zone,...
+    gov_model,gen_model,turb_model,exciter_model,load_model);
 
 aut_model_nosat_nodz =@(s)(model(0,s,false,false));
 % minimodel = @(x)(aut_model_nosat_nodz(x)'*aut_model_nosat_nodz(x)); 
 
 assert(max(abs(aut_model_nosat_nodz(steady_state_1)))<10^-3,'state 1 is not steady');
-Jac1 = NumJacob(aut_model_nosat_nodz,steady_state_1');
+Jac1 = NumJacob(aut_model_nosat_nodz,steady_state_1);
 
 % exciter has only one steady state
 % assert(max(abs(aut_model_nosat_nodz(steady_state_2)))<10^-3,'state 2 is not steady');
-% Jac2 = NumJacob(aut_model_nosat_nodz,steady_state_2');
+% Jac2 = NumJacob(aut_model_nosat_nodz,steady_state_2);
 % disp([eig(Jac1),eig(Jac2)]);
 %% simulation
 time = [0, t_max];
 sim_model_1 = @(t,state)(model(t,state,enable_saturation,use_dead_zone));
 for k=1:number_of_simulations
     max_distance = 0.05;
-    initial_state = generate_state_near(gov_model,gen_model,turb_model,load_model,steady_state_1,max_distance);
-%     initial_state=steady_state_1;
+%     initial_state = generate_state_near(gov_model,gen_model,turb_model,load_model,...
+%         steady_state_1,max_distance);
+    initial_state=steady_state_1;
     fprintf('initial state for simulation %d\n',k);
     printState(0,initial_state,gen_model,turb_model,load_model,gov_model,exciter_model);
     options = odeset('MaxStep',sim_maxstep);
@@ -69,7 +74,8 @@ for k=1:number_of_simulations
 %     options = odeset('MaxStep',sim_maxstep);
     [t, state] = ode15s(sim_model_1, time, initial_state,options);
     [fig_1,fig_2] =...
-        drawResults(t,state,steady_state_1,steady_state_2,gen_model,turb_model,gov_model,exciter_model);
+        drawResults(t,state,steady_state_1,steady_state_2,...
+        gen_model,turb_model,gov_model,exciter_model);
     % save sim results to files
     file_name = sprintf('%.0fMW_load%d',load_model.P_active0/10^6,k);
     saveas(fig_1,sprintf('sim_results/all_%s.png',file_name));
@@ -80,8 +86,10 @@ for k=1:number_of_simulations
 end
 
 %% complete model 
-function [dstate] = full_model(t,state,enable_saturation,use_dead_zone,gov_model,gen_model,turb_model,exciter_model,load_model)
-    [omega_pu,q,g,governer_state,psi,exciter_state] = parseState(state,gov_model.state_size,exciter_model.state_size);
+function [dstate] = full_model(t,state,enable_saturation,use_dead_zone,...
+    gov_model,gen_model,turb_model,exciter_model,load_model)
+    [omega_pu,q,g,governer_state,psi,exciter_state] =...
+        parseState(state,gov_model.state_size,exciter_model.state_size);
     omega_m = omega_pu*gen_model.omega_m_nom;
 
     [ dq,Turbine_power,~,~] = turb_model.model(t,g,q,omega_m);

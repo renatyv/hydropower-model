@@ -1,14 +1,18 @@
 classdef LoadModelPQ
-    properties(Constant)
-        phi_1 = acos(0.9);
-        P_active0 = 600*10^6;
-        Q_reactive0 = LoadModelPQ.P_active0/cos(LoadModelPQ.phi_1)*sin(LoadModelPQ.phi_1);
-    end
     properties
+        phi_1;
+        P_active0;
+        Q_reactive0;
         % 0 -- constant MVA, 22 (a=b=2)-- constant impedance, 12 (a=1,b=2)
         load_mode = 22;
     end
     methods
+        function obj = LoadModelPQ(P_active,phi)
+            obj.P_active0 = P_active;
+            obj.phi_1 = phi;
+            obj.Q_reactive0 = obj.P_active0/cos(obj.phi_1)*sin(obj.phi_1);
+        end
+        
         function [v_d,v_q] = model(this,t,i_d,i_q,omega_m,omega_m_nom,S_base)
         %LOAD_MODEL Implements load models
         % load_resistance0 = S_base/P_active0;
@@ -17,8 +21,10 @@ classdef LoadModelPQ
         p_start = this.P_active0/S_base;
         q_start = this.Q_reactive0/S_base;
 %         load ramp
-        p_end = (200*10^6)/S_base;
-        q_end = p_end*sin(acos(0.9))/0.9;
+%         p_end = (200*10^6)/S_base;
+%         q_end = p_end*sin(acos(0.9))/0.9;
+        p_end = p_start;
+        q_end = q_start;
         p_active = rramp(p_start,p_end,step_start,step_end,t);
         q_reactive = rramp(q_start,q_end,step_start,step_end,t);
 
