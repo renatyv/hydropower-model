@@ -1,5 +1,5 @@
 function [steady_state_1,steady_state_2,N_turb] =...
-    get_steady_state(gov_model,gen_model,turb_model,exciter_model,load_model)
+    get_steady_state(turb_model,gov_model,gen_model,exciter_model,load_model)
 %get_steady_state computes power plant state
 %   ex
 %% generator steady torque
@@ -28,7 +28,9 @@ function [error,steady_state_1,steady_state_2,e_r_1] = s_state(v_ampl)
     %% exciter steady state
     exciter_state_1  = exciter_model.steady(e_r_1);
     exciter_state_2  = exciter_model.steady(e_r_2);
-    error = min(abs(exciter_model.steadyV_ampl(e_r_1)-v_ampl),abs(exciter_model.steadyV_ampl(e_r_2)-v_ampl));
+    [e_r,dex]= exciter_model.model(v_ampl,exciter_state_1,false);
+    error = dex'*dex+abs(e_r-e_r_1);
+%     error = min(abs(exciter_model.steadyV_ampl(e_r_1)-v_ampl),abs(exciter_model.steadyV_ampl(e_r_2)-v_ampl));
 % 	error = min(abs(exciter_model.steadyE_r(v_ampl)-e_r_1),abs(exciter_model.steadyE_r(v_ampl)-e_r_2));
 
     %% complete steady state
@@ -40,7 +42,7 @@ function error = error_func(v_ampl)
     [error,~,~,~] = s_state(v_ampl);
 end
 options = optimset('MaxIter',2000,'TolFun',1e-15,'TolX',1e-15);
-v_ampl = fminsearch(@(v)error_func(v),1.0,options);
+[v_ampl,final_error] = fminsearch(@(v)error_func(v),1.0,options)
 % v_ampls = (0.9:10^-5:1.1);
 % errors = -ones(size(v_ampls));
 % for k=1:length(v_ampls)
@@ -48,5 +50,5 @@ v_ampl = fminsearch(@(v)error_func(v),1.0,options);
 % end
 % [min_error,index]=min(errors)
 % v_ampl = v_ampls(index)
-[~,steady_state_1,steady_state_2,e_r_1] = s_state(v_ampl);
+[error,steady_state_1,steady_state_2,e_r_1] = s_state(v_ampl)
 end

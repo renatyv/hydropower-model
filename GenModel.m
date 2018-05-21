@@ -35,7 +35,8 @@ classdef GenModel
         x_sr = GenModel.x_r-GenModel.x_ad;
         x_rd = GenModel.x_ad+1/(1/(GenModel.x_dpp-GenModel.x_s)-1/GenModel.x_ad-1/GenModel.x_sr);
         x_rq = GenModel.x_aq+1/(1/(GenModel.x_qpp-GenModel.x_s)-1/GenModel.x_aq);
-        r_rd = (GenModel.x_rd*GenModel.x_d-GenModel.x_ad^2)*GenModel.x_rd/(GenModel.omega_er_base*GenModel.x_d*GenModel.x_dp*GenModel.T_dpp);
+        r_rd = (GenModel.x_rd*GenModel.x_d-GenModel.x_ad^2)*GenModel.x_rd/...
+            (GenModel.omega_er_base*GenModel.x_d*GenModel.x_dp*GenModel.T_dpp);
         r_rq = (GenModel.x_rq*GenModel.x_q-GenModel.x_aq^2)/(GenModel.omega_er_base*GenModel.x_q*GenModel.T_qpp);
         T_rd = GenModel.x_rd/(GenModel.omega_er_base*GenModel.r_rd);
         T_rq = GenModel.x_rq/(GenModel.omega_er_base*GenModel.r_rq);
@@ -51,13 +52,17 @@ classdef GenModel
             %I_TO_PSI Solve flux-linkage equations
             %   Detailed explanation goes here
             [psi_d,psi_q,psi_r,psi_rd,psi_rq] = parsePsi(psi);
-            e_q = -(psi_d.*g.x_ad.^3 - psi_r.*g.x_ad.^2.*g.x_r - psi_d.*g.x_ad.^2.*g.x_rd + psi_rd.*g.x_ad.^2.*g.x_rd - psi_rd.*g.x_ad.*g.x_d.*g.x_rd + psi_r.*g.x_d.*g.x_r.*g.x_rd)/...
+            e_q = -(psi_d.*g.x_ad.^3 - psi_r.*g.x_ad.^2.*g.x_r - psi_d.*g.x_ad.^2.*g.x_rd + psi_rd.*g.x_ad.^2.*g.x_rd -...
+                psi_rd.*g.x_ad.*g.x_d.*g.x_rd + psi_r.*g.x_d.*g.x_r.*g.x_rd)/...
                 (g.x_ad.^2.*g.x_d + g.x_ad.^2.*g.x_r + g.x_ad.^2.*g.x_rd - 2.*g.x_ad.^3 - g.x_d.*g.x_r.*g.x_rd);
-            e_rq =-(psi_d.*g.x_ad.^3 - psi_d.*g.x_ad.^2.*g.x_r + psi_r.*g.x_ad.^2.*g.x_r - psi_rd.*g.x_ad.^2.*g.x_rd - psi_r.*g.x_ad.*g.x_d.*g.x_r + psi_rd.*g.x_d.*g.x_r.*g.x_rd)/...
+            e_rq =-(psi_d.*g.x_ad.^3 - psi_d.*g.x_ad.^2.*g.x_r + psi_r.*g.x_ad.^2.*g.x_r - psi_rd.*g.x_ad.^2.*g.x_rd -...
+                psi_r.*g.x_ad.*g.x_d.*g.x_r + psi_rd.*g.x_d.*g.x_r.*g.x_rd)/...
                 (g.x_ad.^2.*g.x_d + g.x_ad.^2.*g.x_r + g.x_ad.^2.*g.x_rd - 2.*g.x_ad.^3 - g.x_d.*g.x_r.*g.x_rd);
             e_rd = (psi_q.*g.x_aq.^2 - psi_rq.*g.x_q.*g.x_rq)/(- g.x_aq.^2 + g.x_q.*g.x_rq);
             i_q = (g.x_rq.*(psi_q - psi_rq))/(- g.x_aq.^2 + g.x_q.*g.x_rq);
-            i_d = (psi_d.*g.x_ad.^2 - psi_r.*g.x_ad.*g.x_r - psi_rd.*g.x_ad.*g.x_rd - psi_d.*g.x_r.*g.x_rd + psi_r.*g.x_r.*g.x_rd + psi_rd.*g.x_r.*g.x_rd)/(g.x_ad.^2.*g.x_d + g.x_ad.^2.*g.x_r + g.x_ad.^2.*g.x_rd - 2.*g.x_ad.^3 - g.x_d.*g.x_r.*g.x_rd);
+            i_d = (psi_d.*g.x_ad.^2 - psi_r.*g.x_ad.*g.x_r - psi_rd.*g.x_ad.*g.x_rd - psi_d.*g.x_r.*g.x_rd ...
+                + psi_r.*g.x_r.*g.x_rd + psi_rd.*g.x_r.*g.x_rd)/...
+                (g.x_ad.^2.*g.x_d + g.x_ad.^2.*g.x_r + g.x_ad.^2.*g.x_rd - 2.*g.x_ad.^3 - g.x_d.*g.x_r.*g.x_rd);
             assert(length([e_q,e_rq,e_rd,i_q,i_d])==5,'output size is wrong');
         end
         

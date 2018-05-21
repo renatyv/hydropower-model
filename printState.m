@@ -1,4 +1,4 @@
-function [] = printState(t,state,gen_model,turb_model,load_model,gov_model,exciter_model)
+function [] = printState(t,state,turb_model,gov_model,gen_model,exciter_model,load_model)
 %printState prints state to consolse in a pretty way
 fprintf('(');
 fprintf('%.2f,',state(1:end-1));

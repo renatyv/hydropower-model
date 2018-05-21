@@ -13,13 +13,13 @@ classdef ExciterPIModel
             exciter_state = e_r;
         end
         
-        function [e_r,dexciter_state] = model(this,v_q,v_d,exciter_state,enable_saturation)
+        function [e_r,dexciter_state] = model(this,v_ampl,exciter_state,enable_saturation)
             %exciterModelPI PI model of exciter governer with saturation
             v_emin = -5;
             v_emax = 5;
             v_rmin = -1;
             v_rmax = 1;
-            v_error = 1-sqrt(v_q^2+v_d^2);
+            v_error = 1-v_ampl;
             if enable_saturation
                 v_error = sat(v_error,v_rmin,v_rmax);
             end

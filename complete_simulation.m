@@ -21,7 +21,7 @@ exciter_model = ExciterPIModel();
 % gov_model = GovernerModelSSHG();
 gov_model = ConstantGoverner();
 % initial active power and coefficient
-P_active = 300*10^6;
+P_active = 600*10^6;
 phi = acos(0.9);
 load_model = LoadModelPQ(P_active,phi);
 % T_m =complete_inertia*omega_m_nom^2/Power_max;
@@ -29,11 +29,23 @@ load_model = LoadModelPQ(P_active,phi);
 
 %% compute and print initial state
 [steady_state_1,steady_state_2,N_turb_steady] =...
-    get_steady_state(gov_model,gen_model,turb_model,exciter_model,load_model);
+    get_steady_state(turb_model,gov_model,gen_model,exciter_model,load_model);
+
+% [omega_pu,q,g,governer_state,psi,exciter_state] =...
+%     parseState(steady_state_1,gov_model.state_size,exciter_model.state_size);
+% [e_q,e_rq,e_rd,i_q,i_d] = gen_model.psi_to_E(psi);
+% omega_m = omega_pu*gen_model.omega_m_nom;
+% [v_d,v_q] = load_model.model(0,i_d,i_q,omega_m,gen_model.omega_m_nom,gen_model.S_base);
+% v_ampl1 = sqrt(v_d^2+v_q^2)
+% v_ampl2 = exciter_model.steadyV_ampl(e_q)
+% e_r1 = exciter_model.steadyE_r(v_ampl1)
+% [e_r2,dex2] = exciter_model.model(v_ampl1,exciter_state,false)
+
+
 disp('steady state 1');
-printState(0,steady_state_1,gen_model,turb_model,load_model,gov_model,exciter_model);
+printState(0,steady_state_1,turb_model,gov_model,gen_model,exciter_model,load_model);
 disp('steady state 2');
-printState(0,steady_state_2,gen_model,turb_model,load_model,gov_model,exciter_model);
+printState(0,steady_state_2,turb_model,gov_model,gen_model,exciter_model,load_model);
 
 %% initialize constant power models
 %% TODO implement class ConstantTorqueTurbineModel isntead
@@ -45,7 +57,7 @@ gen_model.constant_torque = -turb_model.constant_turbine_power/turb_model.consta
 % assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
 model = @(t,state,enable_saturation,use_dead_zone)...
     full_model(t,state,enable_saturation,use_dead_zone,...
-    gov_model,gen_model,turb_model,exciter_model,load_model);
+    turb_model,gov_model,gen_model,exciter_model,load_model);
 
 aut_model_nosat_nodz =@(s)(model(0,s,false,false));
 % minimodel = @(x)(aut_model_nosat_nodz(x)'*aut_model_nosat_nodz(x)); 
@@ -66,7 +78,7 @@ for k=1:number_of_simulations
 %         steady_state_1,max_distance);
     initial_state=steady_state_1;
     fprintf('initial state for simulation %d\n',k);
-    printState(0,initial_state,gen_model,turb_model,load_model,gov_model,exciter_model);
+    printState(0,initial_state,turb_model,gov_model,gen_model,exciter_model,load_model);
     options = odeset('MaxStep',sim_maxstep);
     if integration_stopper
         options = odeset('MaxStep',sim_maxstep,'Events',@stop_integration_event);
@@ -75,7 +87,7 @@ for k=1:number_of_simulations
     [t, state] = ode15s(sim_model_1, time, initial_state,options);
     [fig_1,fig_2] =...
         drawResults(t,state,steady_state_1,steady_state_2,...
-        gen_model,turb_model,gov_model,exciter_model);
+        turb_model,gov_model,gen_model,exciter_model,load_model);
     % save sim results to files
     file_name = sprintf('%.0fMW_load%d',load_model.P_active0/10^6,k);
     saveas(fig_1,sprintf('sim_results/all_%s.png',file_name));
@@ -87,7 +99,7 @@ end
 
 %% complete model 
 function [dstate] = full_model(t,state,enable_saturation,use_dead_zone,...
-    gov_model,gen_model,turb_model,exciter_model,load_model)
+    turb_model,gov_model,gen_model,exciter_model,load_model)
     [omega_pu,q,g,governer_state,psi,exciter_state] =...
         parseState(state,gov_model.state_size,exciter_model.state_size);
     omega_m = omega_pu*gen_model.omega_m_nom;
@@ -96,8 +108,10 @@ function [dstate] = full_model(t,state,enable_saturation,use_dead_zone,...
     Turbine_torque = Turbine_power/omega_m;
 
     [~,~,~,i_q,i_d] = gen_model.psi_to_E(psi);
+%     TODO if load model is 22, the steady state is wrong
     [v_d,v_q] = load_model.model(t,i_d,i_q,omega_m,gen_model.omega_m_nom,gen_model.S_base);
-    [e_r,dexciter_state] = exciter_model.model(v_q,v_d,exciter_state,enable_saturation);
+    v_ampl = sqrt(v_d^2+v_q^2);
+    [e_r,dexciter_state] = exciter_model.model(v_ampl,exciter_state,enable_saturation);
     
     [ dpsi,Electric_torque] =...
             gen_model.model(psi,v_d,v_q,e_r,omega_m);

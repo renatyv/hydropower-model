@@ -3,6 +3,7 @@ classdef LoadModelPQ
         phi_1;
         P_active0;
         Q_reactive0;
+        S_full;
         % 0 -- constant MVA, 22 (a=b=2)-- constant impedance, 12 (a=1,b=2)
         load_mode = 22;
     end
@@ -10,7 +11,8 @@ classdef LoadModelPQ
         function obj = LoadModelPQ(P_active,phi)
             obj.P_active0 = P_active;
             obj.phi_1 = phi;
-            obj.Q_reactive0 = obj.P_active0/cos(obj.phi_1)*sin(obj.phi_1);
+            obj.S_full = obj.P_active0/cos(obj.phi_1);
+            obj.Q_reactive0 = obj.S_full*sin(obj.phi_1);
         end
         
         function [v_d,v_q] = model(this,t,i_d,i_q,omega_m,omega_m_nom,S_base)
@@ -31,14 +33,14 @@ classdef LoadModelPQ
         %% frequency dependance 
         % D_pf = 0..3
         % D_qf = 0..-2
-        D_pf = 0;
-        D_qf = 0;
-        f_ref = omega_m_nom/(2*pi);
-        f = omega_m/(2*pi);
-        delta_f = f-f_ref;
-        p_active = p_active*(1+D_pf*delta_f);
-        q_reactive = q_reactive*(1+D_qf*delta_f);
-
+%         D_pf = 0;
+%         D_qf = 0;
+%         f_ref = omega_m_nom/(2*pi);
+%         f = omega_m/(2*pi);
+%         delta_f = f-f_ref;
+%         p_active = p_active*(1+D_pf*delta_f);
+%         q_reactive = q_reactive*(1+D_qf*delta_f);
+%         s_full = (this.S_full/S_base)^2;
         %% load model
         if this.load_mode == 0
         %     constant MVA, a=b=0

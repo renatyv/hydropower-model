@@ -1,4 +1,5 @@
-function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,gen_model,turb_model,gov_model,exciter_model)
+function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,...
+    turb_model,gov_model,gen_model,exciter_model,load_model)
 %drawResults draws state variables over time
 
 %% set linewidth for all plots 
