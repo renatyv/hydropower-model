@@ -5,6 +5,9 @@ classdef LoadModelPQ
         Q_reactive0;
         S_full;
         % 0 -- constant MVA, 22 (a=b=2)-- constant impedance, 12 (a=1,b=2)
+        
+    end
+    properties
         load_mode = 22;
     end
     methods

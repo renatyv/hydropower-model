@@ -8,15 +8,16 @@ classdef GovernerModel1
         Pilot_base = GovernerModel1.Pilot_max;
         T_mainservo = 0.76;
         T_pilotservo = GovernerModel1.T_mainservo*1.3;
-        
-        PID_Kp=30;
-        PID_Ki=2;
-        K_f = 0.7;
 %         K_dOmega must be small, otherwise unstable
         K_dOmega=0.0;
         g_max = 1.0;
         g_min = 0.0;
         state_size = 2;
+    end
+    properties
+        PID_Kp=30;
+        PID_Ki=2; 
+        K_f = 0.7;
     end
     
     methods

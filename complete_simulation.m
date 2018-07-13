@@ -5,7 +5,7 @@ integration_stopper = true;
 enable_saturation = false;
 use_dead_zone = false;
 number_of_simulations = 1;
-t_max = 20.0;
+t_max = 30.0;
 sim_maxstep = 0.01;
 
 %% configuration
@@ -15,13 +15,14 @@ plot_results = true;
 %% models parameters
 gen_model = GenModel();
 turb_model = TurbineModel1();
+%TODO: steady state is not computed correctly for AC4A model.
 % exciter_model = ExciterModelAC4A();
 exciter_model = ExciterPIModel();
 % gov_model = GovernerModel1();
-% gov_model = GovernerModelSSHG();
-gov_model = ConstantGoverner();
+gov_model = GovernerModelSSHG();
+% gov_model = ConstantGoverner();
 % initial active power and coefficient
-P_active = 600*10^6;
+P_active = 500*10^6;
 phi = acos(0.9);
 load_model = LoadModelPQ(P_active,phi);
 % T_m =complete_inertia*omega_m_nom^2/Power_max;
@@ -30,17 +31,6 @@ load_model = LoadModelPQ(P_active,phi);
 %% compute and print initial state
 [steady_state_1,steady_state_2,N_turb_steady] =...
     get_steady_state(turb_model,gov_model,gen_model,exciter_model,load_model);
-
-% [omega_pu,q,g,governer_state,psi,exciter_state] =...
-%     parseState(steady_state_1,gov_model.state_size,exciter_model.state_size);
-% [e_q,e_rq,e_rd,i_q,i_d] = gen_model.psi_to_E(psi);
-% omega_m = omega_pu*gen_model.omega_m_nom;
-% [v_d,v_q] = load_model.model(0,i_d,i_q,omega_m,gen_model.omega_m_nom,gen_model.S_base);
-% v_ampl1 = sqrt(v_d^2+v_q^2)
-% v_ampl2 = exciter_model.steadyV_ampl(e_q)
-% e_r1 = exciter_model.steadyE_r(v_ampl1)
-% [e_r2,dex2] = exciter_model.model(v_ampl1,exciter_state,false)
-
 
 disp('steady state 1');
 printState(0,steady_state_1,turb_model,gov_model,gen_model,exciter_model,load_model);
@@ -74,9 +64,9 @@ time = [0, t_max];
 sim_model_1 = @(t,state)(model(t,state,enable_saturation,use_dead_zone));
 for k=1:number_of_simulations
     max_distance = 0.05;
-%     initial_state = generate_state_near(gov_model,gen_model,turb_model,load_model,...
-%         steady_state_1,max_distance);
-    initial_state=steady_state_1;
+%     initial_state=steady_state_1;
+    initial_state = generate_state_near(gov_model,gen_model,turb_model,load_model,...
+        steady_state_1,max_distance);
     fprintf('initial state for simulation %d\n',k);
     printState(0,initial_state,turb_model,gov_model,gen_model,exciter_model,load_model);
     options = odeset('MaxStep',sim_maxstep);

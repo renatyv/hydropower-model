@@ -1,8 +1,10 @@
 classdef ExciterPIModel
     properties(Constant)
+        state_size = 1;
+    end
+    properties
         exciter_PID_Ki=2;
         exciter_PID_Kp=10;
-        state_size = 1;
     end
     methods
         function [v_ampl] = steadyV_ampl(this,e_r)

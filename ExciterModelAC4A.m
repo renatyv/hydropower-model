@@ -19,7 +19,6 @@ classdef ExciterModelAC4A
         
         function [v_ampl] = steadyV_ampl(this,e_r)
             v_ampl = this.v_ref+this.v_s-(e_r/this.K_A);
-%             e_r = this.K_A*(this.v_ref-v_ampl +this.v_s);
         end
         
         function [e_r] = steadyE_r(this,v_ampl)

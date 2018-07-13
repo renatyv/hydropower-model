@@ -9,6 +9,7 @@ phi_1 = load_model.phi_1;
 r_s = gen_model.r_s;
 function [error,steady_state_1,steady_state_2,e_r_1] = s_state(v_ampl)
     i_ampl = P0/(S_base*v_ampl*cos(phi_1));
+    
     N_gen = -((i_ampl^2)*r_s*S_base+P0);
     N_turb = -N_gen;
 
@@ -29,7 +30,7 @@ function [error,steady_state_1,steady_state_2,e_r_1] = s_state(v_ampl)
     exciter_state_1  = exciter_model.steady(e_r_1);
     exciter_state_2  = exciter_model.steady(e_r_2);
     [e_r,dex]= exciter_model.model(v_ampl,exciter_state_1,false);
-    error = dex'*dex+abs(e_r-e_r_1);
+    error = 10*(dex'*dex)+abs(e_r-e_r_1);
 %     error = min(abs(exciter_model.steadyV_ampl(e_r_1)-v_ampl),abs(exciter_model.steadyV_ampl(e_r_2)-v_ampl));
 % 	error = min(abs(exciter_model.steadyE_r(v_ampl)-e_r_1),abs(exciter_model.steadyE_r(v_ampl)-e_r_2));
 
@@ -42,13 +43,6 @@ function error = error_func(v_ampl)
     [error,~,~,~] = s_state(v_ampl);
 end
 options = optimset('MaxIter',2000,'TolFun',1e-15,'TolX',1e-15);
-[v_ampl,final_error] = fminsearch(@(v)error_func(v),1.0,options)
-% v_ampls = (0.9:10^-5:1.1);
-% errors = -ones(size(v_ampls));
-% for k=1:length(v_ampls)
-%     [errors(k),~,~] = s_state(v_ampls(k));
-% end
-% [min_error,index]=min(errors)
-% v_ampl = v_ampls(index)
-[error,steady_state_1,steady_state_2,e_r_1] = s_state(v_ampl)
+[v_ampl,final_error] = fminsearch(@(v)error_func(v),1.0,options);
+[error,steady_state_1,steady_state_2,e_r_1] = s_state(v_ampl);
 end

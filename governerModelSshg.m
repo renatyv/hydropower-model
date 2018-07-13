@@ -10,13 +10,15 @@ classdef GovernerModelSSHG
         T_pilotservo = GovernerModelSSHG.T_mainservo*1.3;
         T_driveservo = GovernerModelSSHG.T_pilotservo;
         
-        PID_Kp=35;
-        PID_Ki=25;
-        K_f = 1.0;
         K_dOmega=0.0;
         g_max = 1.0;
         g_min = 0.0;
         state_size = 3;
+    end
+    properties
+        PID_Kp=35;
+        PID_Ki=25;
+        K_f = 1.2;
     end
     methods
         function [omega_m] = steady_freq(this,g)
