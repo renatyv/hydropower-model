@@ -14,9 +14,7 @@ S_base = gen_model.S_base;
 [dq,Turbine_power,H_turb,H_loss] = turb_model.model(0,g,q,omega_m);
 fprintf('omega_m=%.1f(rad/s) Q=%.0f(m^3/s) G=%.0f(mm) H_t=%.0f(m) H_{loss}=%.1f(m)\n',...
     omega_m,q*Q_base,g*G_base,H_turb,H_loss);
-P_active = (v_d*i_d+v_q*i_q)*S_base/10^6;
-Q_reactive = (v_q*i_d-v_d*i_q)*S_base/10^6;
 fprintf('exciter_state=%.1f\n',exciter_state);
-fprintf('active power %.0fMW, reactive power %.0fMW\n',P_active,Q_reactive);
+fprintf('active power %.0fMW, reactive power %.0fMW\n',load_model.P_active0,load_model.Q_reactive0);
 end
 

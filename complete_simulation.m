@@ -54,7 +54,7 @@ aut_model_nosat_nodz =@(s)(model(0,s,false,false));
 
 assert(max(abs(aut_model_nosat_nodz(steady_state_1)))<10^-3,'state 1 is not steady');
 Jac1 = NumJacob(aut_model_nosat_nodz,steady_state_1);
-
+disp(eig(Jac1));
 % exciter has only one steady state
 % assert(max(abs(aut_model_nosat_nodz(steady_state_2)))<10^-3,'state 2 is not steady');
 % Jac2 = NumJacob(aut_model_nosat_nodz,steady_state_2);
