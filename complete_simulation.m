@@ -16,8 +16,8 @@ plot_results = true;
 gen_model = GenModel();
 turb_model = TurbineModel1();
 %TODO: steady state is not computed correctly for AC4A model.
-% exciter_model = ExciterModelAC4A();
-exciter_model = ExciterPIModel();
+exciter_model = ExciterModelAC4A();
+% exciter_model = ExciterPIModel();
 % gov_model = GovernerModel1();
 gov_model = GovernerModelSSHG();
 % gov_model = ConstantGoverner();

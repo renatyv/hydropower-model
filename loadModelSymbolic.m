@@ -26,6 +26,8 @@ fprintf('static load, constant MVA a=b=0\n');
 sol1 = solve([eq1,eq2],[v_d,v_q]);
 simplify(sol1.v_d)
 simplify(sol1.v_q)
+% v_d^2+v_q^2
+simplify((sol1.v_d)^2+(sol1.v_q)^2)
 
 fprintf('static load, constant impedance a=b=2\n');
 eq3 = p*(v_d^2+v_q^2) == v_d*i_d+v_q*i_q;
@@ -33,6 +35,8 @@ eq4 = q*(v_d^2+v_q^2) == v_q*i_d-v_d*i_q;
 sol2 = solve([eq3,eq4],[v_d,v_q]);
 simplify(sol2.v_d)
 simplify(sol2.v_q)
+% v_d^2+v_q^2
+simplify(((i_d*p - i_q*q)/(p^2 + q^2))^2+((i_q*p + i_d*q)/(p^2 + q^2))^2)
 
 fprintf('static load, a=1, b=2\n');
 eq5 = p*sqrt(v_d^2+v_q^2) == v_d*i_d+v_q*i_q;
@@ -40,6 +44,8 @@ eq6 = q*(v_d^2+v_q^2) == v_q*i_d-v_d*i_q;
 sol3 = solve([eq5,eq6],[v_d,v_q]);
 simplify(sol3.v_d)
 simplify(sol3.v_q)
+% v_d^2+v_q^2
+simplify((-(i_d^2*i_q - i_q*p^2 + i_q^3 - i_d*p*(i_d^2 + i_q^2 - p^2)^(1/2))/(q*(i_d^2 + i_q^2)))^2+((i_d*i_q^2 - i_d*p^2 + i_d^3 + i_q*p*(i_d^2 + i_q^2 - p^2)^(1/2))/(q*(i_d^2 + i_q^2)))^2)
 
 
 

@@ -11,11 +11,32 @@ classdef LoadModelPQ
         load_mode = 22;
     end
     methods
+        
         function obj = LoadModelPQ(P_active,phi)
             obj.P_active0 = P_active;
             obj.phi_1 = phi;
             obj.S_full = obj.P_active0/cos(obj.phi_1);
             obj.Q_reactive0 = obj.S_full*sin(obj.phi_1);
+        end
+        
+        function [i_ampl] = get_i_ampl(this,v_ampl,S_base)
+            p_active = this.P_active0/S_base;
+            q_reactive = this.Q_reactive0/S_base;
+            %% load model
+            if this.load_mode == 0
+            %     constant MVA, a=b=0
+            %     v_ampl^2 = (p^2 + q^2)/(i_d^2 + i_q^2)
+                i_ampl = sqrt((p_active^2+q_reactive^2)/v_ampl^2);
+            else
+                if this.load_mode == 22
+            %     constant impedance, a=b=2
+            %     v_ampl^2 = (i_d^2 + i_q^2)/(p^2 + q^2)
+                    i_ampl = sqrt((v_ampl^2)*(p_active^2+q_reactive^2));
+                else
+                    %     v_ampl^2 = (i_d^2 + i_q^2 - p^2)/q^2
+                  i_ampl = sqrt((v_ampl^2)*(q_reactive^2)+p_active^2);  
+                end
+            end
         end
         
         function [v_d,v_q] = model(this,t,i_d,i_q,omega_m,omega_m_nom,S_base)

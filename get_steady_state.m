@@ -7,8 +7,8 @@ P0 = load_model.P_active0;
 S_base = gen_model.S_base;
 phi_1 = load_model.phi_1;
 r_s = gen_model.r_s;
-function [error,steady_state_1,steady_state_2,e_r_1] = s_state(v_ampl)
-    i_ampl = P0/(S_base*v_ampl*cos(phi_1));
+function [error,steady_state_1,steady_state_2,e_r_1,i_ampl] = s_state(v_ampl)
+    i_ampl = load_model.get_i_ampl(v_ampl,gen_model.S_base);
     
     N_gen = -((i_ampl^2)*r_s*S_base+P0);
     N_turb = -N_gen;
@@ -43,6 +43,20 @@ function error = error_func(v_ampl)
     [error,~,~,~] = s_state(v_ampl);
 end
 options = optimset('MaxIter',2000,'TolFun',1e-15,'TolX',1e-15);
-[v_ampl,final_error] = fminsearch(@(v)error_func(v),1.0,options);
-[error,steady_state_1,steady_state_2,e_r_1] = s_state(v_ampl);
+% v_ampl = 1.0009
+[v_ampl,final_error] = fminsearch(@(v)error_func(v),1.0,options)
+% error = 1e-23, i_ampl = 0.8672
+[error,steady_state_1,steady_state_2,e_r_1,i_ampl] = s_state(v_ampl)
+[omega_pu,q,g,governer_state,psi,exciter_state] =...
+    parseState(steady_state_1,gov_model.state_size,exciter_model.state_size)
+% e_r = 1.2138 dex = 1e-11
+[e_r,dex]= exciter_model.model(v_ampl,exciter_state,false)
+[~,~,~,i_q,i_d] = gen_model.psi_to_E(psi)
+% i_ampl = 0.8672 ! Same thing!
+i_ampl = sqrt(i_d^2+i_q^2)
+% 
+omega_m = omega_pu*gen_model.omega_m_nom;
+[v_d,v_q] = load_model.model(0,i_d,i_q,omega_m,gen_model.omega_m_nom,gen_model.S_base)
+% different( WTF is going on? Error in load model
+v_ampl = sqrt(v_d^2+v_q^2)
 end
