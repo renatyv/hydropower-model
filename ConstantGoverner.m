@@ -7,7 +7,6 @@ classdef ConstantGoverner
     methods
         
         function [omega_m] = steady_freq(this,g)
-%             any frequency is steady
             omega_m = this.omega_ref - this.K_f*g;
         end
         
@@ -16,8 +15,6 @@ classdef ConstantGoverner
         end
         
         function [dg,dgoverner_state] = model(this,g,governer_state,omega_m,dOmega_m,enable_saturation,use_dead_zone)
-        %REGULATOR_MODEL Summary of this function goes here
-        %   Detailed explanation goes here
         dg = 0;
         dgoverner_state = [];
         end

@@ -9,15 +9,13 @@ t_max = 30.0;
 sim_maxstep = 0.01;
 
 %% configuration
-
 plot_results = true;
 
-%% models parameters
+%% initialize models
 gen_model = GenModel();
 turb_model = TurbineModel1();
 turb_model.use_constant_turbine_efficiency = false;
 turb_model.simulate_vortex_rope_oscillations = true;
-%TODO: steady state is not computed correctly for AC4A model.
 exciter_model = ExciterModelAC4A();
 % exciter_model = ExciterPIModel();
 % gov_model = GovernerModel1();
@@ -27,8 +25,6 @@ gov_model = GovernerModelSSHG();
 P_active = 100*10^6;
 phi = acos(0.9);
 load_model = LoadModelPQ(P_active,phi);
-% T_m =complete_inertia*omega_m_nom^2/Power_max;
-% % % initial frequency in radian/s, electrical radian/s, HZ and rpm
 
 %% compute and print initial state
 [steady_state_1,steady_state_2,N_turb_steady] =...
@@ -40,33 +36,27 @@ disp('steady state 2');
 printState(0,steady_state_2,turb_model,gov_model,gen_model,exciter_model,load_model);
 
 %% initialize constant power models
-%% TODO implement class ConstantTorqueTurbineModel isntead
 turb_model.constant_turbine_power = N_turb_steady;
 turb_model.constant_turbine_speed = steady_state_1(1);
 gen_model.constant_torque = -turb_model.constant_turbine_power/turb_model.constant_turbine_speed;
 
 %% compute jacobian and check local stability
-% assert(max(abs(aut_model(steady_state)))<10^-3,'state is not steady');
 model = @(t,state,enable_saturation,use_dead_zone)...
     full_model(t,state,enable_saturation,use_dead_zone,...
     turb_model,gov_model,gen_model,exciter_model,load_model);
 
 aut_model_nosat_nodz =@(s)(model(0,s,false,false));
-% minimodel = @(x)(aut_model_nosat_nodz(x)'*aut_model_nosat_nodz(x)); 
 
 assert(max(abs(aut_model_nosat_nodz(steady_state_1)))<10^-3,'state 1 is not steady');
 Jac1 = NumJacob(aut_model_nosat_nodz,steady_state_1);
 disp(eig(Jac1));
-% exciter has only one steady state
-% assert(max(abs(aut_model_nosat_nodz(steady_state_2)))<10^-3,'state 2 is not steady');
-% Jac2 = NumJacob(aut_model_nosat_nodz,steady_state_2);
-% disp([eig(Jac1),eig(Jac2)]);
 %% simulation
 time = [0, t_max];
 sim_model_1 = @(t,state)(model(t,state,enable_saturation,use_dead_zone));
 for k=1:number_of_simulations
     max_distance = 0.05;
     initial_state=steady_state_1;
+%     start from some random state near the steady state
 %     initial_state = generate_state_near(gov_model,gen_model,turb_model,load_model,...
 %         steady_state_1,max_distance);
     fprintf('initial state for simulation %d\n',k);
@@ -75,7 +65,6 @@ for k=1:number_of_simulations
     if integration_stopper
         options = odeset('MaxStep',sim_maxstep,'Events',@stop_integration_event);
     end
-%     options = odeset('MaxStep',sim_maxstep);
     [t, state] = ode15s(sim_model_1, time, initial_state,options);
     [fig_1,fig_2] =...
         drawResults(t,state,steady_state_1,steady_state_2,...
