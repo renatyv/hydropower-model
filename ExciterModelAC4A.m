@@ -4,15 +4,18 @@ classdef ExciterModelAC4A
         v_rmax = 5.64;
         v_imin = -10;
         v_imax = 10;
+
+        v_ref = 1
+        state_size = 2;
+    end
+    properties
         T_A = 0.015;
         T_B = 10.0;
         T_C = 1.0;
         K_A = 200;
-        v_ref = 1
         v_s = 0.007;
         K_C = 0;
         T_r = 20e-3;
-        state_size = 2;
     end
     
     methods

@@ -43,14 +43,14 @@ classdef LoadModelPQ
         %LOAD_MODEL Implements load models
         % load_resistance0 = S_base/P_active0;
         step_start = 1.0;
-        step_end = 5.0;
+        step_end = 8.0;
         p_start = this.P_active0/S_base;
         q_start = this.Q_reactive0/S_base;
 %         load ramp
-%         p_end = (200*10^6)/S_base;
-%         q_end = p_end*sin(acos(0.9))/0.9;
-        p_end = p_start;
-        q_end = q_start;
+        p_end = (600*10^6)/S_base;
+        q_end = p_end*sin(acos(0.9))/0.9;
+%         p_end = p_start;
+%         q_end = q_start;
         p_active = rramp(p_start,p_end,step_start,step_end,t);
         q_reactive = rramp(q_start,q_end,step_start,step_end,t);
 

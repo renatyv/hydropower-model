@@ -355,7 +355,7 @@ classdef TurbineModel1
         function eta = compute_efficiency(q_i,n_i)
             persistent q_in_i_to_eta;
             if isempty(q_in_i_to_eta)
-                [eta_Q_u,eta_n_u,eta_eta_u] = getCharacteristic();
+                [eta_Q_u,eta_n_u,eta_eta_u] = TurbineModel1.getCharacteristic();
                 q_in_i_to_eta = griddedInterpolant(eta_Q_u,eta_n_u,eta_eta_u);
 %                 turbine_eta_m = @(q_i_input,n_i_input)(q_in_i_to_eta(q_i_input*Qi_coeff,n_i_input));
             end

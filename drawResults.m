@@ -94,7 +94,7 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,...
     end
     hold off;
     xlabel('t');
-    ylabel('omega_m');
+    ylabel('\omega');
     %% Active, reactive, turbine power
     subplot(3,2,2);
     active_powers = (v_ds.*i_ds+v_qs.*i_qs)*gen_model.S_base/10^6;
@@ -138,7 +138,7 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,...
     plot([t(1);t(end)],[g_steady;g_steady],'b--',...
     [t(1);t(end)],[q_steady;q_steady],'r--',...
     [t(1);t(end)],[H_turb_steady/H_base;H_turb_steady/H_base],'k--');
-    legend([p1],'g','q','h_{turb}','Location','northeastoutside');
+    legend([p1],'g','q','h','Location','northeastoutside');
     hold off;
 
     %% stator voltages and currents

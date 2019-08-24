@@ -15,6 +15,8 @@ plot_results = true;
 %% models parameters
 gen_model = GenModel();
 turb_model = TurbineModel1();
+turb_model.use_constant_turbine_efficiency = false;
+turb_model.simulate_vortex_rope_oscillations = true;
 %TODO: steady state is not computed correctly for AC4A model.
 exciter_model = ExciterModelAC4A();
 % exciter_model = ExciterPIModel();
@@ -22,7 +24,7 @@ exciter_model = ExciterModelAC4A();
 gov_model = GovernerModelSSHG();
 % gov_model = ConstantGoverner();
 % initial active power and coefficient
-P_active = 500*10^6;
+P_active = 100*10^6;
 phi = acos(0.9);
 load_model = LoadModelPQ(P_active,phi);
 % T_m =complete_inertia*omega_m_nom^2/Power_max;
@@ -64,9 +66,9 @@ time = [0, t_max];
 sim_model_1 = @(t,state)(model(t,state,enable_saturation,use_dead_zone));
 for k=1:number_of_simulations
     max_distance = 0.05;
-%     initial_state=steady_state_1;
-    initial_state = generate_state_near(gov_model,gen_model,turb_model,load_model,...
-        steady_state_1,max_distance);
+    initial_state=steady_state_1;
+%     initial_state = generate_state_near(gov_model,gen_model,turb_model,load_model,...
+%         steady_state_1,max_distance);
     fprintf('initial state for simulation %d\n',k);
     printState(0,initial_state,turb_model,gov_model,gen_model,exciter_model,load_model);
     options = odeset('MaxStep',sim_maxstep);

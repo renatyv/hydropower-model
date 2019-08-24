@@ -8,8 +8,8 @@ use_dead_zone = false;
 %% models parameters
 gen_model = GenModel();
 turb_model = TurbineModel1();
-% exciter_model = ExciterModelAC4A();
-exciter_model = ExciterPIModel();
+exciter_model = ExciterModelAC4A();
+% exciter_model = ExciterPIModel();
 % gov_model = GovernerModel1();
 gov_model = GovernerModelSSHG();
 % gov_model = ConstantGoverner();
@@ -24,33 +24,44 @@ for k = (1:1:10000)
     gov_model.K_f = 2*rand;
 %     exciter_model.exciter_PID_Kp = 10*rand;
 %     exciter_model.exciter_PID_Ki = 10*rand;
+    exciter_model.K_A = 400*rand;
+    exciter_model.T_B = 20*rand;
+    
+
     load_modes = [0,22,21];
-    load_mode=load_modes(randi([1 length(load_modes)],1,1));
-    l1 = max_eigenvalue(600*10^6,load_mode,turb_model,gen_model,exciter_model,gov_model);
-    if l1>=0
-        continue
-    else
-        
-    end
-    l2 = max_eigenvalue(400*10^6,load_mode,turb_model,gen_model,exciter_model,gov_model);
+%     load_mode=load_modes(randi([1 length(load_modes)],1,1));
+    load_mode = 21;
+    mpower = (500+100*rand)*10^6;
+    l3 = max_eigenvalue(mpower,load_mode,turb_model,gen_model,exciter_model,gov_model);
+%     if l3>=0
+%         continue
+%     end
+%     disp('3');
+    
+    l2 = max_eigenvalue(350*10^6,load_mode,turb_model,gen_model,exciter_model,gov_model);
     if l2<0
         continue
-    else
-        fprintf('600,400, l1=%.2f PID_Kp=%.0f PID_Ki=%.0f K_f=%.1f load_mode=%d\n',...
-            l1,gov_model.PID_Kp,gov_model.PID_Ki,gov_model.K_f,load_mode);
     end
-    l3 = max_eigenvalue(100*10^6,load_mode,turb_model,gen_model,exciter_model,gov_model);
-    if l3>=0
+    disp('2');
+    fprintf('%.1f, l3=%.2f PID_Kp=%.0f PID_Ki=%.0f K_f=%.1f load_mode=%d\n',...
+        mpower/(10^6),l3,gov_model.PID_Kp,gov_model.PID_Ki,gov_model.K_f,load_mode);
+    fprintf('350, l2=%.2f PID_Kp=%.0f PID_Ki=%.0f K_f=%.1f load_mode=%d\n',...
+        l2,gov_model.PID_Kp,gov_model.PID_Ki,gov_model.K_f,load_mode);
+    
+    l1 = max_eigenvalue(200*10^6,load_mode,turb_model,gen_model,exciter_model,gov_model);
+    if l1>=0
         continue
-    else
-        disp('parameters found');
-        disp(gov_model.PID_Kp);
-        disp(gov_model.PID_Ki);
-        disp(gov_model.K_f);
-        disp(exciter_model.exciter_PID_Ki);
-        disp(exciter_model.exciter_PID_Kp);
-        disp(load_mode);
-    end
+    end 
+    disp('1');
+    fprintf('200, l1=%.2f PID_Kp=%.0f PID_Ki=%.0f K_f=%.1f load_mode=%d\n',...
+        l1,gov_model.PID_Kp,gov_model.PID_Ki,gov_model.K_f,load_mode);
+    
+    
+    
+    disp('parameters found');
+    disp(gov_model);
+    disp(exciter_model);
+    disp(load_mode);
 end
 
 %% complete model 
