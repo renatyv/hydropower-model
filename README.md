@@ -1,8 +1,12 @@
-# Sayan-Shushenskaya HPP Model
+# Sayano-Shushenskaya HPP Model
+This work is devoted to the construction and study of a mathematical model of hydropower unit, consisting of synchronous generator, hydraulic turbine, speed governor, exceiter, and electrical load.
 
-Here I implemented model of Sayano-Shushenskaya hydro power plant in Matlab.
+It is motivated by the accident happened on the Sayano- Shushenskaya hydropower plant in 2009. Parameters of the Sayano- Shushenskaya hydropower plant were used to model the system.
+This model was used to publish paper [Analytical-numerical analysis of dynamical model of Sayano-Shushenskaya hydropower plant: stability, oscillations, and accident](https://www.sciencedirect.com/science/article/abs/pii/S1007570420303609).
 
-What is modeled:
+
+
+## What is modeled:
 1. Hydraulic turbine + penstock, ```TurbineModel1.m```.
 Hydro turnie is modeled using non-linear zero-order model(no odes, only functional mapping). Graph of the constant efficiency level lines obtained experimentally us used.
 Penstock is modeled using the inelastic model (1 ODE).
@@ -22,3 +26,20 @@ What this model does:
 Run ```complete_simulation.m``` file.
 In several seconds it should plot the simulation results
 ![Simulation results example](docs/sim_results_sample.png "Simulation results with defatul parameters")
+
+
+
+Consider the main elements of hydro power plant unit.
+![HPP model](docs/turbine.png)
+The hydropower unit of Sayano-Shushenskaya HPP consists of synchronous generator and Francis hydraulic turbine.
+The rotor of generator and the runner are connected together by a rigid shaft.
+
+
+The dam creates a difference in water level between the upper reservoir and lower reservoir. The flow of water is delivered from  upper reservoir to turbine by penstock through the spiral casing.
+Water jets impact on the blades of the turbine producing torque applied to the rotating shaft.
+Since the turbine shaft is rigidly connected with the generator rotor,
+the rotor starts to rotate and to produce electricity, which is transferred to the grid.
+The water flow is controlled by means of guide vanes.
+
+For the safety of the power network, the frequency should remain almost constant.
+This is reached by keeping the same speed of the synchronous generator. The rotational speed is controlled by the speed governor.

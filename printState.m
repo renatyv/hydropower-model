@@ -15,6 +15,6 @@ S_base = gen_model.S_base;
 fprintf('omega_m=%.1f(rad/s) Q=%.0f(m^3/s) G=%.0f(mm) H_t=%.0f(m) H_{loss}=%.1f(m)\n',...
     omega_m,q*Q_base,g*G_base,H_turb,H_loss);
 fprintf('exciter_state=%.1f\n',exciter_state);
-fprintf('active power %.0fMW, reactive power %.0fMW\n',load_model.P_active0,load_model.Q_reactive0);
+fprintf('active power %.1fMW, reactive power %.2fMW\n',load_model.P_active0/10^6,load_model.Q_reactive0/10^6);
 end
 

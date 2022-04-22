@@ -23,7 +23,7 @@ sim_maxstep = 0.01;
 %% configuration
 plot_results = true;
 
-%% initialize models
+%% initialize models    
 % generator model
 gen_model = GenModel();
 % turbine model

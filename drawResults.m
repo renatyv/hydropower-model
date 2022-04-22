@@ -75,7 +75,8 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,...
     end
     hold off;
     xlabel('g');
-    ylabel('omega_m');
+    ylabel('Frequency [rad/s] VS. gate opening [p.u.]');
+
 
     %%
     fig_1 = figure(1);
@@ -95,6 +96,7 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,...
     hold off;
     xlabel('t');
     ylabel('\omega');
+    title('Runner frequency, rad/s');
     %% Active, reactive, turbine power
     subplot(3,2,2);
     active_powers = (v_ds.*i_ds+v_qs.*i_qs)*gen_model.S_base/10^6;
@@ -102,9 +104,10 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,...
     generator_torques = (psi_ds.*i_qs-psi_qs.*i_ds)*gen_model.torque_base;
     generator_powers_pu = omega_ms.*generator_torques/10^6;
     plot(t,active_powers,t,reactive_powers,t,Turbine_powers/10^6,t,generator_powers_pu);
-    legend('active load','reactive load','turbine','generator');
+    legend('active load','reactive load','turbine power MW','generator power p.u.');
     xlabel('t');
-    ylabel('power, MW');
+    ylabel('MW');
+    title('Power')
 
     %% phase portrait on universal characteristic
     subplot(3,2,4);
@@ -123,10 +126,11 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,...
     plot(Q_is,n_is,'b',Q_is(1),n_is(1),'b*',Q_i_steady,n_i_steady,'go');
     hold off;
     axis([0,700,50,100]);
-    xlabel('Q_i');
-    ylabel('n_i');
+    xlabel('Q_i, l/s');
+    ylabel('n_i, rev/min');
+    title('Water flow and speed reduced to a 1m-diameter model turbine')
 
-    %% turbin variables
+    %% turbine variables
     subplot(3,2,3);
     H_base = 200;
     p1 = plot(t,gs,'b',...
@@ -139,6 +143,7 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,...
     [t(1);t(end)],[q_steady;q_steady],'r--',...
     [t(1);t(end)],[H_turb_steady/H_base;H_turb_steady/H_base],'k--');
     legend([p1],'g','q','h','Location','northeastoutside');
+    title('Governor gate opening, turbine water flow, turbine water head all in p.u.')
     hold off;
 
     %% stator voltages and currents
@@ -146,10 +151,12 @@ function [fig_1,fig_2] = drawResults(t,state,steady_state_1,steady_state_2,...
     plot(t,i_ds,'r',t,i_qs,'g',t,v_ds,'b',t,v_qs,'k');
     legend('i_d', 'i_q','v_d','v_q','Location','northeastoutside');
     xlabel('t');
+    title('Stator voltages and currents in DQ frame, p.u.')
     
     %% stator voltage amplitude and exciter voltage
     subplot(3,2,6);
     plot(t,sqrt(v_qs.^2+v_ds.^2),t,e_rs);
     legend('sqrt(v_d^2+v_q^2)','e_r');
     xlabel('t');
+    title('stator voltage amplitude and exciter voltage')
 end
