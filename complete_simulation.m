@@ -1,19 +1,34 @@
 clear variables;
 
+%% Create folders for storing simulation results
+SIM_RESULTS_FOLDER = 'sim_results';
+if ~exist(SIM_RESULTS_FOLDER,'dir')
+    mkdir(SIM_RESULTS_FOLDER)
+end
+
 %% % % configure simulation
 integration_stopper = true;
+% saturation for the governor servos, default false
 enable_saturation = false;
+% governor dead zone. if true, governor will not react to small changes of
+% rotation speed omega near zero, default false
 use_dead_zone = false;
+% simulate with randomized parameters. number of simulations, default 1
 number_of_simulations = 1;
+% simulation time, default 30.0
 t_max = 30.0;
+% max simulation step, default 0.01
 sim_maxstep = 0.01;
 
 %% configuration
 plot_results = true;
 
 %% initialize models
+% generator model
 gen_model = GenModel();
+% turbine model
 turb_model = TurbineModel1();
+% use variable turbine efficiency
 turb_model.use_constant_turbine_efficiency = false;
 turb_model.simulate_vortex_rope_oscillations = true;
 exciter_model = ExciterModelAC4A();
@@ -21,9 +36,11 @@ exciter_model = ExciterModelAC4A();
 % gov_model = GovernerModel1();
 gov_model = GovernerModelSSHG();
 % gov_model = ConstantGoverner();
-% initial active power and coefficient
+% initial active power and coefficient, Watts
 P_active = 100*10^6;
+% active vs reactive power angle
 phi = acos(0.9);
+% load model
 load_model = LoadModelPQ(P_active,phi);
 
 %% compute and print initial state
@@ -71,9 +88,9 @@ for k=1:number_of_simulations
         turb_model,gov_model,gen_model,exciter_model,load_model);
     % save sim results to files
     file_name = sprintf('%.0fMW_load%d',load_model.P_active0/10^6,k);
-    saveas(fig_1,sprintf('sim_results/all_%s.png',file_name));
-    saveas(fig_2,sprintf('sim_results/pp_%s.png',file_name));
-    filename = sprintf('sim_results/data_%s',file_name);
+    saveas(fig_1,sprintf('%s/all_%s.png',SIM_RESULTS_FOLDER,file_name));
+    saveas(fig_2,sprintf('%s/pp_%s.png',SIM_RESULTS_FOLDER,file_name));
+    filename = sprintf('%s/data_%s',SIM_RESULTS_FOLDER,file_name);
 %     save everything except fig_1, fig_2
     save(filename,'-regexp','^(?!(fig_1|fig_2)$).');
 end
